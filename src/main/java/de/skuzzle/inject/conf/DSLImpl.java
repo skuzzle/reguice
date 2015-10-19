@@ -129,6 +129,12 @@ final class DSLImpl implements ChoseBufferType,
     }
 
     @Override
+    public ChoseTargetType containingText() {
+        this.contentType = new StringTextContentType();
+        return this;
+    }
+
+    @Override
     public ChoseTargetType containingProperties() {
         this.contentType = new PropertiesContentType();
         return this;

@@ -43,6 +43,7 @@ public interface Resources {
     }
 
     interface ChoseContentType {
+        ChoseTargetType containingText();
         ChoseTargetType containingJson();
         ChoseTargetType containingXml();
         ChoseTargetType containingProperties();
