@@ -3,11 +3,11 @@
 ... allows you to simply bind resources for injecting them with Google's Guice. 
 
 Features:
-    * Bind from several sources (class path, file system, URL, web application context)
-    * Bind several content types (String, properties, json, xml and custom)
-    * Bind properties directly to a Java interface
-    * Allow reloading of bound Objects by injecting a `Provider`
-    * Fluent API for configuring the binding
+* Bind from several sources (class path, file system, URL, web application context)
+* Bind several content types (String, properties, json, xml and custom)
+* Bind properties directly to a Java interface
+* Allow reloading of bound Objects by injecting a `Provider`
+* Fluent API for configuring the binding
     
 ## Quickstart
 
