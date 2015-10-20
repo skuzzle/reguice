@@ -8,7 +8,17 @@ Features:
 * Bind properties directly to a Java interface
 * Allow reloading of bound Objects by injecting a `Provider`
 * Fluent API for configuring the binding
-    
+
+## Maven artifact
+reguice is available from Maven Central:
+```xml
+<dependency>
+    <groupId>de.skuzzle.inject</groupId>
+    <artifactId>reguice</artifactId>
+    <version>0.1.0</version>
+</dependency>
+```
+
 ## Quickstart
 
 The fluent API is accessible through the `Resources` class and may be used in your Guice 
