@@ -1,6 +1,5 @@
 package de.skuzzle.inject.conf;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,7 +26,7 @@ class ResourceUtil {
         return Files.getLastModifiedTime(path).toMillis();
     }
 
-    private Charset getCharset(URLConnection connection) {
+    private static Charset getCharset(URLConnection connection) {
         String cs = connection.getContentEncoding();
         if (cs == null) {
             cs = Charset.defaultCharset().name();
@@ -37,6 +36,14 @@ class ResourceUtil {
 
     public Reader newReader(Path path, Charset cs) throws IOException {
         return Files.newBufferedReader(path, cs);
+    }
+
+    public InputStream newInputStream(URL url) throws IOException {
+        return url.openStream();
+    }
+
+    public InputStream newInputStream(Path path) throws IOException {
+        return Files.newInputStream(path);
     }
 
     public Reader newReader(URL url) throws IOException {
@@ -52,12 +59,5 @@ class ResourceUtil {
 
     public Reader newReader(InputStream stream, Charset charset) throws IOException {
         return new InputStreamReader(stream, charset);
-    }
-
-    public BufferedReader convert(Reader r) {
-        if (r instanceof BufferedReader) {
-            return (BufferedReader) r;
-        }
-        return new BufferedReader(r);
     }
 }

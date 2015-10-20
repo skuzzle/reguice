@@ -5,6 +5,7 @@ import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.InputStream;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -47,5 +48,14 @@ public class NioResourceTest {
         when(this.util.getLastModifiedTime(this.path)).thenReturn(1337L);
         final long actual = this.subject.getLastModifiedTime();
         assertEquals(1337L, actual);
+    }
+
+    @Test
+    public void testOpenBinaryStream() throws Exception {
+        final InputStream in = mock(InputStream.class);
+        when(this.util.newInputStream(this.path)).thenReturn(in);
+        final InputStream actual = this.subject.openBinaryStream();
+
+        assertSame(in, actual);
     }
 }

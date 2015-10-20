@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
 
 import org.junit.Before;
@@ -16,35 +15,33 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.google.inject.ProvisionException;
 
 @RunWith(MockitoJUnitRunner.class)
-public class StringTextContentTypeTest {
+public class PropertiesContentTypeTest {
+
+    public static interface FooBar {
+        String getFoo();
+    }
 
     @Mock
     private TextResource resource;
 
-    private StringTextContentType subject;
+    private PropertiesContentType subject;
 
     @Before
     public void setUp() throws Exception {
-        this.subject = new StringTextContentType();
-    }
+        when(this.resource.openStream()).thenReturn(new StringReader("foo=bar"));
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testNotAString() throws Exception {
-        this.subject.createInstance(Integer.class, this.resource);
+        this.subject = new PropertiesContentType();
     }
 
     @Test
     public void testCreateInstance() throws Exception {
-        final Reader reader = new StringReader("foo\nbar");
-        when(this.resource.openStream()).thenReturn(reader);
-
-        final String s = this.subject.createInstance(String.class, this.resource);
-        assertEquals("foo\nbar", s);
+        final FooBar inst = this.subject.createInstance(FooBar.class, this.resource);
+        assertEquals("bar", inst.getFoo());
     }
 
     @Test(expected = ProvisionException.class)
     public void testIOException() throws Exception {
         when(this.resource.openStream()).thenThrow(IOException.class);
-        this.subject.createInstance(String.class, this.resource);
+        this.subject.createInstance(FooBar.class, this.resource);
     }
 }

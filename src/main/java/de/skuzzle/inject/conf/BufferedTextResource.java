@@ -4,7 +4,8 @@ import java.io.IOException;
 
 final class BufferedTextResource extends ConstantTextResource {
 
-    private long lastRead;
+    private long lastCharsRead;
+    private long lastBytesRead;
 
     private BufferedTextResource(TextResource wrapped) {
         super(wrapped);
@@ -18,16 +19,22 @@ final class BufferedTextResource extends ConstantTextResource {
     }
 
     @Override
-    protected boolean rebuffer() throws IOException {
-        if (super.rebuffer()) {
-            this.lastRead = getLastModifiedTime();
-            return true;
-        }
-        final long lastMod = getLastModifiedTime();
-        if (lastMod > this.lastRead) {
-            this.lastRead = lastMod;
-            return true;
-        }
-        return false;
+    protected void newBytesBuffered() throws IOException {
+        this.lastBytesRead = getLastModifiedTime();
+    }
+
+    @Override
+    protected void newCharsBuffered() throws IOException {
+        this.lastCharsRead = getLastModifiedTime();
+    }
+
+    @Override
+    protected boolean rebufferBytes() throws IOException {
+        return getLastModifiedTime() > this.lastBytesRead;
+    }
+
+    @Override
+    protected boolean rebufferChars() throws IOException {
+        return getLastModifiedTime() > this.lastCharsRead;
     }
 }

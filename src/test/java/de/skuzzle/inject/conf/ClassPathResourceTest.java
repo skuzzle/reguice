@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -44,6 +45,17 @@ public class ClassPathResourceTest {
 
         final Reader actual = this.subject.openStream();
         assertSame(reader, actual);
+    }
+
+    @Test
+    public void testOpenBinaryStream() throws Exception {
+        final InputStream in = mock(InputStream.class);
+
+        final URL url = new URL("http://www.google.com");
+        when(this.classLoader.getResource(this.resourcePath)).thenReturn(url);
+        when(this.util.newInputStream(url)).thenReturn(in);
+        final InputStream actual = this.subject.openBinaryStream();
+        assertSame(in, actual);
     }
 
     @Test

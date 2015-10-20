@@ -1,6 +1,7 @@
 package de.skuzzle.inject.conf;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -18,7 +19,12 @@ abstract class AbstractURLResource implements TextResource {
     protected abstract URL getURL() throws IOException;
 
     @Override
-    public Reader openStream() throws IOException {
+    public final InputStream openBinaryStream() throws IOException {
+        return this.util.newInputStream(getURL());
+    }
+
+    @Override
+    public final Reader openStream() throws IOException {
         if (this.charset == null) {
             return this.util.newReader(getURL());
         }
@@ -26,7 +32,7 @@ abstract class AbstractURLResource implements TextResource {
     }
 
     @Override
-    public long getLastModifiedTime() throws IOException {
+    public final long getLastModifiedTime() throws IOException {
         return this.util.getLastModifiedTime(getURL());
     }
 

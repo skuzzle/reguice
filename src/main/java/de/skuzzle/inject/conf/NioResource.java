@@ -1,6 +1,7 @@
 package de.skuzzle.inject.conf;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -27,4 +28,8 @@ final class NioResource implements TextResource {
         return this.util.newReader(this.path, this.charset);
     }
 
+    @Override
+    public InputStream openBinaryStream() throws IOException {
+        return this.util.newInputStream(this.path);
+    }
 }
