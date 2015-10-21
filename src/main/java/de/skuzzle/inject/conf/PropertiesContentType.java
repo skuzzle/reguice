@@ -29,7 +29,7 @@ class PropertiesContentType implements TextContentType {
         checkArgument(type.isInterface(), "type must be an interface");
         final ClassLoader cl = type.getClassLoader();
         final Properties props = getProperties(resource);
-        final InvocationHandler handler = new PropertiesProxy(props);
+        final InvocationHandler handler = new PropertiesProxy(props, this.beanUtil);
 
         return (T) Proxy.newProxyInstance(cl, new Class[] { type }, handler);
     }
