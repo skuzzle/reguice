@@ -36,9 +36,7 @@ final class DSLImpl implements ChoseBufferType,
     private Function<TextResource, TextResource> wrapper = Function.identity();
     private Function<Charset, TextResource> resourceFactory;
 
-    // intentionally leave out type here to not force ServletContext to be on
-    // class path
-    private MutableProvider servletCtxProvider;
+    private MutableProvider<ServletContext> servletCtxProvider;
 
     private final TextResourceFactory textResourceFactory;
 
@@ -192,7 +190,6 @@ final class DSLImpl implements ChoseBufferType,
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public ChoseContentTypeAndCharset servletResource(String path) {
         checkArgument(path != null, "path is null");
         this.servletCtxProvider = new MutableProvider<ServletContext>();
