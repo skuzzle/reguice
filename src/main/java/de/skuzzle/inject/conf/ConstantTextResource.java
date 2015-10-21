@@ -46,11 +46,11 @@ class ConstantTextResource implements TextResource {
     }
 
     protected void newBytesBuffered() throws IOException {
-
+        // to be overridden by subclasses
     }
 
     protected void newCharsBuffered() throws IOException {
-
+        // to be overridden by subclasses
     }
 
     protected boolean rebufferBytes() throws IOException {
