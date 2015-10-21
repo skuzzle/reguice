@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.CharBuffer;
 
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
@@ -21,6 +22,13 @@ class ConstantTextResource implements TextResource {
 
     static TextResource wrap(TextResource resource) {
         return new ConstantTextResource(resource);
+    }
+
+    @Override
+    public int read(CharBuffer cb) throws IOException {
+        try (Reader reader = openStream()) {
+            return reader.read(cb);
+        }
     }
 
     @Override

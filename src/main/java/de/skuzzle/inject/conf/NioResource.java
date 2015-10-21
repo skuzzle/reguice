@@ -3,6 +3,7 @@ package de.skuzzle.inject.conf;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 
@@ -16,6 +17,11 @@ final class NioResource implements TextResource {
         this.util = util;
         this.path = path;
         this.charset = charset;
+    }
+
+    @Override
+    public int read(CharBuffer cb) throws IOException {
+        return this.util.readFromSource(this, cb);
     }
 
     @Override

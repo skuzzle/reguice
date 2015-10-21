@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 
 abstract class AbstractURLResource implements TextResource {
@@ -17,6 +18,11 @@ abstract class AbstractURLResource implements TextResource {
     }
 
     protected abstract URL getURL() throws IOException;
+
+    @Override
+    public final int read(CharBuffer cb) throws IOException {
+        return this.util.readFromSource(this, cb);
+    }
 
     @Override
     public final InputStream openBinaryStream() throws IOException {

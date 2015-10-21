@@ -7,6 +7,7 @@ import java.io.Reader;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -59,5 +60,11 @@ class ResourceUtil {
 
     public Reader newReader(InputStream stream, Charset charset) throws IOException {
         return new InputStreamReader(stream, charset);
+    }
+
+    public int readFromSource(TextResource resource, CharBuffer buffer) throws IOException {
+        try (Reader reader = resource.openStream()) {
+            return reader.read(buffer);
+        }
     }
 }
