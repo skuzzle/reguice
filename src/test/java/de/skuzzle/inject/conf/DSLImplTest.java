@@ -42,12 +42,16 @@ public class DSLImplTest {
     @Mock
     private ScopedBindingBuilder scopedBuilder;
 
+
+    private ContentTypeFactoryImpl contentTypeFactory;
+
     private final Key<DSLImplTest> selfType = Key.get(DSLImplTest.class);
     private DSLImpl subject;
 
     @Before
     public void setUp() throws Exception {
-        this.subject = new DSLImpl(this.factory);
+        this.contentTypeFactory = new ContentTypeFactoryImpl(new BeanUtil());
+        this.subject = new DSLImpl(this.factory, this.contentTypeFactory);
 
         when(this.binder.bind(this.selfType)).thenReturn(this.linkedBuilder);
         when(this.linkedBuilder.toProvider(Mockito.any(Provider.class))).thenReturn(this.scopedBuilder);

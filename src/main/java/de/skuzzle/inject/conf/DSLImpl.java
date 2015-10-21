@@ -39,9 +39,11 @@ final class DSLImpl implements ChoseBufferType,
     private MutableProvider<ServletContext> servletCtxProvider;
 
     private final TextResourceFactory textResourceFactory;
+    private final ContentTypeFactory contentTypeFactory;
 
-    DSLImpl(TextResourceFactory factory) {
+    DSLImpl(TextResourceFactory factory, ContentTypeFactory contentTypeFactory) {
         this.textResourceFactory = factory;
+        this.contentTypeFactory = contentTypeFactory;
     }
 
     private static class MutableProvider<T> implements Provider<T> {
@@ -117,7 +119,7 @@ final class DSLImpl implements ChoseBufferType,
 
     @Override
     public ChoseTargetType containingJson() {
-        this.contentType = new JsonContentType();
+        this.contentType = this.contentTypeFactory.newJsonContentType();
         return this;
     }
 
@@ -128,13 +130,13 @@ final class DSLImpl implements ChoseBufferType,
 
     @Override
     public ChoseTargetType containingText() {
-        this.contentType = new StringTextContentType();
+        this.contentType = this.contentTypeFactory.newStringContentType();
         return this;
     }
 
     @Override
     public ChoseTargetType containingProperties() {
-        this.contentType = new PropertiesContentType();
+        this.contentType = this.contentTypeFactory.newPropertiesContentType();
         return this;
     }
 

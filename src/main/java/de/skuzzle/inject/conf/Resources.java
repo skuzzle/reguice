@@ -14,8 +14,11 @@ public interface Resources {
 
     public static ChoseBufferType bind() {
         final ResourceUtil util = new ResourceUtil();
+        final BeanUtil beanUtil = new BeanUtil();
         final TextResourceFactory factory = new TextResourceFactoryImpl(util);
-        return new DSLImpl(factory);
+        final ContentTypeFactory contentTypeFactory = new ContentTypeFactoryImpl(
+                beanUtil);
+        return new DSLImpl(factory, contentTypeFactory);
     }
 
     interface ChoseBufferType extends ChoseResources {

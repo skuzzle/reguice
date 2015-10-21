@@ -1,9 +1,11 @@
 package de.skuzzle.inject.conf;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 
 import org.junit.Test;
@@ -20,12 +22,35 @@ public class JsonContentTypeTest {
         public int foo = 1;
     }
 
+    private static interface Sample2 {
+        int getFoo();
+        String getBar();
+        boolean isCool();
+        int[] getArray();
+        Sample3 getSample();
+        Object getUnknown();
+    }
+
+    private static interface Sample3 {
+        Object getObject();
+    }
+
+
     private final String json = "{ foo: 1 }";
 
+    private final String json2 = "{" +
+            "  foo: 1337,\n" +
+            "  bar: 'xyz',\n" +
+            "  cool: true,\n" +
+            "  array: [1, 2, 3],\n" +
+            "  sample: {\n" +
+            "    object: 'abc'\n" +
+            "  }" +
+            "}";
     @Mock
     private TextResource resource;
 
-    private final JsonContentType subject = new JsonContentType();
+    private final JsonContentType subject = new JsonContentType(new BeanUtil());
 
     @Test
     public void testCreateInstance() throws Exception {
@@ -33,6 +58,19 @@ public class JsonContentTypeTest {
         final Sample sample = this.subject.createInstance(Sample.class, this.resource);
 
         assertEquals(1, sample.foo);
+    }
+
+    @Test
+    public void testCreateInterface() throws Exception {
+        final Reader reader = new StringReader(this.json2);
+        when(this.resource.openStream()).thenReturn(reader);
+        final Sample2 inst = this.subject.createInstance(Sample2.class, this.resource);
+        assertEquals(1337, inst.getFoo());
+        assertEquals("xyz", inst.getBar());
+        assertEquals(true, inst.isCool());
+        assertEquals(null, inst.getUnknown());
+        assertEquals("abc", inst.getSample().getObject());
+        assertArrayEquals(new int[] {1, 2, 3}, inst.getArray());
     }
 
     @Test(expected = ProvisionException.class)
