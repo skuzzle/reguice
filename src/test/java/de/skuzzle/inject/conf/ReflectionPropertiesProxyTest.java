@@ -59,7 +59,7 @@ public class ReflectionPropertiesProxyTest {
         this.subject = (TestInterface) Proxy.newProxyInstance(
                 getClass().getClassLoader(),
                 new Class[] { TestInterface.class },
-                new PropertiesProxy(this.props));
+                new PropertiesProxy(this.props, new BeanUtil()));
     }
 
     @Test(expected = IllegalArgumentException.class)
