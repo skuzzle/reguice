@@ -30,7 +30,7 @@ public class PropertiesContentTypeTest {
     public void setUp() throws Exception {
         when(this.resource.openStream()).thenReturn(new StringReader("foo=bar"));
 
-        this.subject = new PropertiesContentType();
+        this.subject = new PropertiesContentType(new BeanUtil());
     }
 
     @Test

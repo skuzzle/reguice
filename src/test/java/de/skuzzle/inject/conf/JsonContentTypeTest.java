@@ -24,6 +24,7 @@ public class JsonContentTypeTest {
 
     private static interface Sample2 {
         int getFoo();
+        double getPi();
         String getBar();
         boolean isCool();
         int[] getArray();
@@ -40,6 +41,7 @@ public class JsonContentTypeTest {
 
     private final String json2 = "{" +
             "  foo: 1337,\n" +
+            "  pi: 3.1415,\n" +
             "  bar: 'xyz',\n" +
             "  cool: true,\n" +
             "  array: [1, 2, 3],\n" +
@@ -47,6 +49,7 @@ public class JsonContentTypeTest {
             "    object: 'abc'\n" +
             "  }" +
             "}";
+
     @Mock
     private TextResource resource;
 
@@ -66,6 +69,7 @@ public class JsonContentTypeTest {
         when(this.resource.openStream()).thenReturn(reader);
         final Sample2 inst = this.subject.createInstance(Sample2.class, this.resource);
         assertEquals(1337, inst.getFoo());
+        assertEquals(3.1415, inst.getPi(), 0.1);
         assertEquals("xyz", inst.getBar());
         assertEquals(true, inst.isCool());
         assertEquals(null, inst.getUnknown());

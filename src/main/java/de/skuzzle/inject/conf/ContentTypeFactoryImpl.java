@@ -15,7 +15,7 @@ class ContentTypeFactoryImpl implements ContentTypeFactory {
 
     @Override
     public TextContentType newPropertiesContentType() {
-        return new PropertiesContentType();
+        return new PropertiesContentType(this.beanUtil);
     }
 
     @Override

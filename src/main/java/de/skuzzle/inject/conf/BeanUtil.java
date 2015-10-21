@@ -58,8 +58,11 @@ class BeanUtil {
         } else if (methodName.startsWith("is")) {
             prefixLen = 2;
         } else {
-            throw new IllegalArgumentException(String.format(
-                    "'%s' is not a valid getter name", methodName));
+            return methodName;
+        }
+
+        if (prefixLen == methodName.length()) {
+            return methodName;
         }
         final StringBuilder b = new StringBuilder(methodName.length());
         final String part = methodName.substring(prefixLen);

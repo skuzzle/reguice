@@ -17,6 +17,12 @@ class PropertiesContentType implements TextContentType {
 
     private static final Logger LOG = LoggerFactory.getLogger(PropertiesContentType.class);
 
+    private final BeanUtil beanUtil;
+
+    PropertiesContentType(BeanUtil beanUtil) {
+        this.beanUtil = beanUtil;
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public <T> T createInstance(Class<T> type, TextResource resource) {
