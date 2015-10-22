@@ -29,11 +29,45 @@ annotated with `@Named("manifestContent")`.
 @Override
 public void configure() {
     Resources.bind()
-            .buffered()
             .classPathResource("META-INF/MANIFEST.mf")
             .encodedWith(StandardCharset.UTF_8)
             .containingText()
             .to(Key.get(String.class, Names.named("manifestContent")))
+            .in(Singleton.class)
+            .using(binder());
+}
+```
+
+The text content of the file can automatically be mapped to a Manifest (provided by 
+`java.util.jar`) instance by implementing your own TextContentType:
+
+```java
+public class ManifestContent implements TextContentType {
+
+    @Override
+    public <T> T createInstance(Class<T> type, TextResource resource) {
+        checkArgument(Manifest.class.isAssignableFrom(type));
+        try (InputStream in = resource.openBinaryStream()) {
+            final Manifest mf = new Manifest();
+            mf.read(in);
+            return type.cast(mf);
+        } catch (final IOException e) {
+            throw new ProvisionException("Error while reading manifest", e);
+        }
+    }
+}
+```
+
+The resource can then be bound to `Manifest.class` like:
+
+```java
+@Override
+public void configure() {
+    Resources.bind()
+            .classPathResource("META-INF/MANIFEST.mf")
+            .encodedWith(StandardCharset.UTF_8)
+            .containing(new ManifestContent())
+            .to(Manifest.class)
             .in(Singleton.class)
             .using(binder());
 }
@@ -51,10 +85,10 @@ dataFolder=data/
 public interface AppSettings {
     int getThreadCount();
     String getDataFolder();
-    // ...
 }
+```
 
-// ...
+```java
 @Override
 public void configure() {
     Resources.bind()
@@ -69,3 +103,5 @@ public void configure() {
 
 In this example, _reguice_ will automatically create an implementation of the provided 
 interface and map its getters to the properties of the specified resource.
+
+The same will work for json content type too.
