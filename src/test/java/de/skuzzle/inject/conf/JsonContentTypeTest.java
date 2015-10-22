@@ -30,6 +30,7 @@ public class JsonContentTypeTest {
         int[] getArray();
         Sample3 getSample();
         Object getUnknown();
+        long getWithParameter(Object object);
     }
 
     private static interface Sample3 {
@@ -61,6 +62,14 @@ public class JsonContentTypeTest {
         final Sample sample = this.subject.createInstance(Sample.class, this.resource);
 
         assertEquals(1, sample.foo);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetWithParameter() throws Exception {
+        final Reader reader = new StringReader(this.json2);
+        when(this.resource.openStream()).thenReturn(reader);
+        final Sample2 inst = this.subject.createInstance(Sample2.class, this.resource);
+        inst.getWithParameter(new Object());
     }
 
     @Test

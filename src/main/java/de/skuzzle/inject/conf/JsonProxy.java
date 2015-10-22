@@ -28,6 +28,7 @@ class JsonProxy implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        checkArgument(args == null, "mapped methods must not have parameters");
         final String propertyName = this.beanUtil.getPropertyName(method.getName());
         final JsonElement element = this.root.get(propertyName);
         return getObject(propertyName, element, method.getReturnType());

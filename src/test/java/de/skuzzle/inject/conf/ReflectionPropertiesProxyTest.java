@@ -46,7 +46,7 @@ public class ReflectionPropertiesProxyTest {
 
         Object getNoCoerce();
 
-        void invalidMethodName();
+        int getWithArg(Object foo);
     }
 
     private final Properties props = new Properties();
@@ -62,14 +62,14 @@ public class ReflectionPropertiesProxyTest {
                 new PropertiesProxy(this.props, new BeanUtil()));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testInvalidMethodName() throws Exception {
-        this.subject.invalidMethodName();
-    }
-
     @Test(expected = IllegalStateException.class)
     public void testGetUnknown() throws Exception {
         this.subject.getTestByte();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetWithArg() throws Exception {
+        this.subject.getWithArg(new Object());
     }
 
     @Test

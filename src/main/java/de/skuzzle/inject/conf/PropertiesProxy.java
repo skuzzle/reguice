@@ -1,5 +1,7 @@
 package de.skuzzle.inject.conf;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -16,6 +18,7 @@ class PropertiesProxy implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        checkArgument(args == null, "mapped methods must not have parameters");
         final String propertyName = this.util.getPropertyName(method.getName());
         final Object result = this.properties.get(propertyName);
         if (result == null) {
