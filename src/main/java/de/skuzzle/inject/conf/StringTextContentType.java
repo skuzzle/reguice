@@ -17,7 +17,7 @@ final class StringTextContentType implements TextContentType {
         try (Reader reader = resource.openStream()) {
             final String result = CharStreams.toString(reader);
             // safe cast as by precondition
-            return type.cast(result.toString());
+            return type.cast(result);
         } catch (final IOException e) {
             throw new ProvisionException(String.format(
                     "Error while reading from '%s'", resource), e);
