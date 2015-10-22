@@ -37,6 +37,8 @@ public void configure() {
             .using(binder());
 }
 ```
+Please note that the last call of the fluently chained methods must always be 
+to `using(binder())`.
 
 The text content of the file can automatically be mapped to a Manifest (provided by 
 `java.util.jar`) instance by implementing your own TextContentType:
