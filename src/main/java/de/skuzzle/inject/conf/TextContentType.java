@@ -15,8 +15,7 @@ public interface TextContentType {
      * passed here, is the one that the user passed to
      * {@link ChoseTargetType#to(Class)} when binding a resource.
      *
-     * <T> The result type.
-     *
+     * @param <T> The result type.
      * @param type The type to create an instance of.
      * @param resource The resource to create an instance from.
      * @return The created Object.
