@@ -1,3 +1,5 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.skuzzle.inject/reguice/badge.svg)](https://maven-badges.herokuapp.com/maven-central/de.skuzzle.inject/reguice)
+
 # reguice
 
 ... allows you to simply bind resources for injecting them with Google's Guice. 
