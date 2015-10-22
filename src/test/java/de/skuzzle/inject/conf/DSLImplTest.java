@@ -247,4 +247,14 @@ public class DSLImplTest {
     public void testNullTest14() throws Exception {
         this.subject.to(getClass()).in(null);
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullTest15() throws Exception {
+        this.subject.to(getClass(), null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullTest16() throws Exception {
+        this.subject.to(null, "");
+    }
 }

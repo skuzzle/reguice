@@ -16,6 +16,7 @@ import javax.servlet.ServletContext;
 import com.google.inject.Binder;
 import com.google.inject.Key;
 import com.google.inject.binder.ScopedBindingBuilder;
+import com.google.inject.name.Names;
 
 import de.skuzzle.inject.conf.Resources.ChoseBufferType;
 import de.skuzzle.inject.conf.Resources.ChoseContentType;
@@ -115,6 +116,13 @@ final class DSLImpl implements ChoseBufferType,
     public <T> FinalizeWithScope<T> to(Class<T> type) {
         checkArgument(type != null, "type is null");
         return new FinalizeImpl<>(Key.get(type));
+    }
+
+    @Override
+    public <T> FinalizeWithScope<T> to(Class<T> type, String name) {
+        checkArgument(type != null, "type is null");
+        checkArgument(name != null, "name is null");
+        return new FinalizeImpl<>(Key.get(type, Names.named(name)));
     }
 
     @Override

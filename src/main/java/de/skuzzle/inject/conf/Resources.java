@@ -56,6 +56,7 @@ public interface Resources {
     interface ChoseTargetType {
         <T> FinalizeWithScope<T> to(Key<T> key);
         <T> FinalizeWithScope<T> to(Class<T> type);
+        <T> FinalizeWithScope<T> to(Class<T> type, String name);
     }
 
     interface FinalizeWithScope<T> extends Finalize<T> {
