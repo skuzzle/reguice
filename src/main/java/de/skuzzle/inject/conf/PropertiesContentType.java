@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
+import java.util.Map;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -26,15 +27,20 @@ class PropertiesContentType implements TextContentType {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T createInstance(Class<T> type, TextResource resource) {
-        checkArgument(type.isInterface(), "type must be an interface");
         final ClassLoader cl = type.getClassLoader();
         final Properties props = getProperties(resource);
-        final InvocationHandler handler = new PropertiesProxy(props, this.beanUtil);
 
+        // bind directly to Map/Properties instance
+        if (Map.class.isAssignableFrom(type)) {
+            return type.cast(props);
+        }
+
+        checkArgument(type.isInterface(), "type must be an interface");
+        final InvocationHandler handler = new PropertiesProxy(props, this.beanUtil);
         return (T) Proxy.newProxyInstance(cl, new Class[] { type }, handler);
     }
 
-    private Properties getProperties(TextResource resource) {
+    private static Properties getProperties(TextResource resource) {
         try (Reader r = resource.openStream()) {
             final Properties result = new Properties();
             result.load(r);

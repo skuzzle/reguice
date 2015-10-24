@@ -28,9 +28,9 @@ class ResourceUtil {
     }
 
     private static Charset getCharset(URLConnection connection) {
-        String cs = connection.getContentEncoding();
+        final String cs = connection.getContentEncoding();
         if (cs == null) {
-            cs = Charset.defaultCharset().name();
+            return Charset.defaultCharset();
         }
         return Charset.forName(cs);
     }

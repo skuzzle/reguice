@@ -37,43 +37,53 @@ class JsonProxy implements InvocationHandler {
     private Object getObject(String memberName, JsonElement element,
             Class<?> targetType) {
         return this.objectMap.computeIfAbsent(memberName,
-                key -> coerceToObject(targetType, element));
+                key -> coerce(targetType, element));
     }
 
-    private Object coerceToObject(Class<?> targetType, JsonElement element) {
+    private Object coerce(Class<?> targetType, JsonElement element) {
         if (element == null) {
             return null;
         } else if (element.isJsonPrimitive()) {
-            final JsonPrimitive primitive = element.getAsJsonPrimitive();
-            if (primitive.isBoolean()) {
-                checkArgument(targetType == Boolean.class || targetType == Boolean.TYPE);
-                return primitive.getAsBoolean();
-            } else if (primitive.isNumber()) {
-                return this.beanUtil.coerceNumber(primitive.getAsNumber(), targetType);
-            } else if (primitive.isString()) {
-                checkArgument(targetType.isAssignableFrom(String.class));
-                return primitive.getAsString();
-            }
+            return coercePrimitive(targetType, element.getAsJsonPrimitive());
         } else if (element.isJsonNull()) {
             return null;
         } else if (element.isJsonArray()) {
-            checkArgument(targetType.isArray());
-            final JsonArray array = element.getAsJsonArray();
-            final Object arr = Array.newInstance(targetType.getComponentType(),
-                    array.size());
-            for (int i = 0; i < array.size(); ++i) {
-                final Object elem = coerceToObject(targetType.getComponentType(),
-                        array.get(i));
-                Array.set(arr, i, elem);
-            }
-            return arr;
+            return coerceArray(targetType, element.getAsJsonArray());
         }  else if (element.isJsonObject()) {
-            checkArgument(targetType.isInterface());
-            final InvocationHandler handler = new JsonProxy(
-                    element.getAsJsonObject(), this.beanUtil);
-            final ClassLoader cl = getClass().getClassLoader();
-            return Proxy.newProxyInstance(cl, new Class[] { targetType }, handler);
+            return coerceObject(targetType, element.getAsJsonObject());
         }
         throw new AssertionError("not reachable");
+    }
+
+    private Object coercePrimitive(Class<?> targetType, JsonPrimitive primitive) {
+        if (primitive.isBoolean()) {
+            checkArgument(targetType == Boolean.class || targetType == Boolean.TYPE);
+            return primitive.getAsBoolean();
+        } else if (primitive.isNumber()) {
+            return this.beanUtil.coerceNumber(primitive.getAsNumber(), targetType);
+        } else if (primitive.isString()) {
+            checkArgument(targetType.isAssignableFrom(String.class));
+            return primitive.getAsString();
+        }
+        throw new AssertionError();
+    }
+
+    private Object coerceArray(Class<?> targetType, JsonArray array) {
+        checkArgument(targetType.isArray());
+        final Object arr = Array.newInstance(targetType.getComponentType(),
+                array.size());
+        for (int i = 0; i < array.size(); ++i) {
+            final Object elem = coerce(targetType.getComponentType(),
+                    array.get(i));
+            Array.set(arr, i, elem);
+        }
+        return arr;
+    }
+
+    private Object coerceObject(Class<?> targetType, JsonObject object) {
+        checkArgument(targetType.isInterface());
+        final InvocationHandler handler = new JsonProxy(object, this.beanUtil);
+        final ClassLoader cl = getClass().getClassLoader();
+        return Proxy.newProxyInstance(cl, new Class[] { targetType }, handler);
     }
 }

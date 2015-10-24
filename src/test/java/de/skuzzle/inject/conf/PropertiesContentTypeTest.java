@@ -1,10 +1,12 @@
 package de.skuzzle.inject.conf;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Map;
+import java.util.Properties;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -43,5 +45,21 @@ public class PropertiesContentTypeTest {
     public void testIOException() throws Exception {
         when(this.resource.openStream()).thenThrow(IOException.class);
         this.subject.createInstance(FooBar.class, this.resource);
+    }
+
+    @Test
+    public void testMapToMap() throws Exception {
+        final Map<String, Object> map = this.subject.createInstance(Map.class,
+                this.resource);
+
+        assertEquals("bar", map.get("foo"));
+    }
+
+    @Test
+    public void testMapToProperties() throws Exception {
+        final Properties props = this.subject.createInstance(Properties.class,
+                this.resource);
+
+        assertEquals("bar", props.get("foo"));
     }
 }
