@@ -8,6 +8,7 @@ import java.nio.file.Path;
 
 import javax.servlet.ServletContext;
 
+import com.google.gson.GsonBuilder;
 import com.google.inject.Binder;
 import com.google.inject.Key;
 import com.google.inject.Module;
@@ -143,6 +144,7 @@ public interface Resources {
         ChoseTargetType containingText();
 
         ChoseTargetType containingJson();
+        ChoseTargetType containingJson(GsonBuilder builder);
 
         ChoseTargetType containingXml();
 

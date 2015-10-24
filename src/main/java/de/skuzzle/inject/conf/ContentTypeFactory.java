@@ -1,5 +1,7 @@
 package de.skuzzle.inject.conf;
 
+import com.google.gson.GsonBuilder;
+
 /**
  * Internal factory class for creating different kinds of
  * {@link TextContentType}.
@@ -8,7 +10,7 @@ package de.skuzzle.inject.conf;
  */
 interface ContentTypeFactory {
 
-    TextContentType newJsonContentType();
+    TextContentType newJsonContentType(GsonBuilder builder);
 
     TextContentType newPropertiesContentType();
 

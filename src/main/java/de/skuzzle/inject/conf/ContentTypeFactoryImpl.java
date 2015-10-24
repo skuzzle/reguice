@@ -1,5 +1,7 @@
 package de.skuzzle.inject.conf;
 
+import com.google.gson.GsonBuilder;
+
 class ContentTypeFactoryImpl implements ContentTypeFactory {
 
     private final BeanUtil beanUtil;
@@ -9,8 +11,8 @@ class ContentTypeFactoryImpl implements ContentTypeFactory {
     }
 
     @Override
-    public TextContentType newJsonContentType() {
-        return new JsonContentType(this.beanUtil);
+    public TextContentType newJsonContentType(GsonBuilder builder) {
+        return new JsonContentType(this.beanUtil, builder);
     }
 
     @Override

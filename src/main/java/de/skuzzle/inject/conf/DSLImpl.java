@@ -13,6 +13,7 @@ import java.util.function.Function;
 import javax.inject.Provider;
 import javax.servlet.ServletContext;
 
+import com.google.gson.GsonBuilder;
 import com.google.inject.Binder;
 import com.google.inject.Key;
 import com.google.inject.binder.ScopedBindingBuilder;
@@ -127,7 +128,14 @@ final class DSLImpl implements ChoseBufferType,
 
     @Override
     public ChoseTargetType containingJson() {
-        this.contentType = this.contentTypeFactory.newJsonContentType();
+        this.contentType = this.contentTypeFactory.newJsonContentType(new GsonBuilder());
+        return this;
+    }
+
+    @Override
+    public ChoseTargetType containingJson(GsonBuilder builder) {
+        checkArgument(builder != null, "builder is null");
+        this.contentType = this.contentTypeFactory.newJsonContentType(builder);
         return this;
     }
 

@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.google.gson.GsonBuilder;
 import com.google.inject.ProvisionException;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -54,7 +55,8 @@ public class JsonContentTypeTest {
     @Mock
     private TextResource resource;
 
-    private final JsonContentType subject = new JsonContentType(new BeanUtil());
+    private final JsonContentType subject = new JsonContentType(new BeanUtil(),
+            new GsonBuilder());
 
     @Test
     public void testCreateInstance() throws Exception {
