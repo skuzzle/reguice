@@ -111,8 +111,6 @@ public interface Resources {
     interface ChooseBufferType extends ChooseResources {
         ChooseResources buffered();
 
-        ChooseResources reloadable();
-
         ChooseResources constant();
 
         ChooseResources cached(CachingStrategy strategy);

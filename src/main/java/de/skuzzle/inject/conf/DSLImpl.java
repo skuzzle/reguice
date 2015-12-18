@@ -313,12 +313,6 @@ final class DSLImpl implements
     }
 
     @Override
-    public ChooseResources reloadable() {
-        this.cacheStrategy = null;
-        return this;
-    }
-
-    @Override
     public ChooseResources constant() {
         this.cacheStrategy = ConstantCacheStrategy.getInstance();
         return this;

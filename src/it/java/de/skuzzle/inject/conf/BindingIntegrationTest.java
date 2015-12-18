@@ -56,7 +56,7 @@ public class BindingIntegrationTest {
 
                 bind(ServletContext.class).toInstance(mockCtx);
 
-                Resources.bind()
+                Resources.bind().constant()
                         .servletResource("test.properties")
                         .containingText()
                         .to(String.class, "fromServlet")

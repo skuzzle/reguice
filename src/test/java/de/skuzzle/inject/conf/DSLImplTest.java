@@ -62,7 +62,7 @@ public class DSLImplTest {
 
         when(contentType.createInstance(DSLImplTest.class, resource)).thenReturn(this);
 
-        this.subject.reloadable()
+        this.subject
                 .resource(resource)
                 .containing(contentType)
                 .to(getClass())
@@ -91,7 +91,7 @@ public class DSLImplTest {
 
     @Test
     public void testBindURL() throws Exception {
-        this.subject.reloadable()
+        this.subject
                 .urlResource("http://www.google.de")
                 .containingJson()
                 .to(getClass())
