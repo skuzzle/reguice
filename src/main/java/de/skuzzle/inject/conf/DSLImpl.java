@@ -87,8 +87,8 @@ final class DSLImpl implements
             final TextResource resource = createResource();
             final Class<T> targetType = (Class<T>) this.targetKey
                     .getTypeLiteral().getRawType();
-            final TextContentType contentType = contentTypeProvider.get();
-            return contentType.createInstance(targetType, resource);
+            final TextContentType contentTypeInst = contentTypeProvider.get();
+            return contentTypeInst.createInstance(targetType, resource);
         }
 
         @Override
@@ -99,6 +99,7 @@ final class DSLImpl implements
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public void using(Binder binder) {
             checkArgument(binder != null, "binder is null");
 

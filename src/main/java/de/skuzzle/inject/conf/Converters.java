@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 final class Converters {
 
-    private final static Logger LOG = LoggerFactory.getLogger(Converters.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Converters.class);
 
     private static final Map<Class<?>, Converter<?>> CONVERTERS;
     private static final Map<Class<?>, Function<String, ?>> PARSERS;
@@ -49,6 +49,10 @@ final class Converters {
                     converter);
             }
         });
+    }
+
+    private Converters() {
+        // hidden constructor
     }
 
     @SuppressWarnings("unchecked")

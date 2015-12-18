@@ -29,7 +29,8 @@ final class TimestampCacheStrategy implements CachingStrategy {
         return checkTimestamp(resource, this.lastBytesRead);
     }
 
-    private boolean checkTimestamp(TextResource resource, long compare) throws IOException {
+    private static boolean checkTimestamp(TextResource resource, long compare)
+            throws IOException {
         return resource.getLastModifiedTime() > compare;
     }
 }
