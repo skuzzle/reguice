@@ -76,12 +76,6 @@ final class DSLImpl implements
             this.targetKey = targetKey;
         }
 
-        @Override
-        public T create() {
-            checkArgument(DSLImpl.this.contentType != null);
-            return create(() -> DSLImpl.this.contentType);
-        }
-
         @SuppressWarnings("unchecked")
         private T create(Provider<TextContentType> contentTypeProvider) {
             final TextResource resource = createResource();

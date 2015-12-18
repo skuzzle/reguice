@@ -170,7 +170,6 @@ public interface Resources {
     }
 
     interface FinalizeWithScope<T> extends Finalize<T> {
-        T create();
         Finalize<T> in(Class<? extends Annotation> scope);
     }
 
