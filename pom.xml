@@ -59,10 +59,10 @@
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 		</dependency>
-        <dependency>
+        <!-- <dependency>
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service</artifactId>
-        </dependency>
+        </dependency> -->
         
 		<!-- Logging -->
 		<dependency>
