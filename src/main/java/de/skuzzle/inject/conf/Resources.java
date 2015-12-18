@@ -158,6 +158,8 @@ public interface Resources {
         ChooseTargetType containingProperties();
 
         ChooseTargetType containing(TextContentType contentType);
+
+        ChooseTargetType containing(Class<? extends TextContentType> contentTypeType);
     }
 
     interface ChooseTargetType {

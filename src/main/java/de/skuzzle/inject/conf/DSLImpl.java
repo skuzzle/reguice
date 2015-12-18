@@ -35,7 +35,10 @@ final class DSLImpl implements
         ChooseContentTypeAndCharset,
         ChooseTargetType {
 
+    // either of these 2 fields will be nonnull
     private TextContentType contentType;
+    private Class<? extends TextContentType> contentTypeType;
+
     private Charset charset;
     private Function<Charset, TextResource> resourceFactory;
     private MutableProvider<ServletContext> servletCtxProvider;
@@ -74,12 +77,18 @@ final class DSLImpl implements
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         public T create() {
-            final TextResource actual = createResource();
+            checkArgument(DSLImpl.this.contentType != null);
+            return create(() -> DSLImpl.this.contentType);
+        }
+
+        @SuppressWarnings("unchecked")
+        private T create(Provider<TextContentType> contentTypeProvider) {
+            final TextResource resource = createResource();
             final Class<T> targetType = (Class<T>) this.targetKey
                     .getTypeLiteral().getRawType();
-            return DSLImpl.this.contentType.createInstance(targetType, actual);
+            final TextContentType contentType = contentTypeProvider.get();
+            return contentType.createInstance(targetType, resource);
         }
 
         @Override
@@ -93,8 +102,19 @@ final class DSLImpl implements
         public void using(Binder binder) {
             checkArgument(binder != null, "binder is null");
 
-            binder.requestInjection(DSLImpl.this.contentType);
-            final Provider<T> provider = this::create;
+            final Provider<TextContentType> contentTypeProvider;
+            if (DSLImpl.this.contentType != null) {
+                binder.requestInjection(DSLImpl.this.contentType);
+                contentTypeProvider = () -> DSLImpl.this.contentType;
+            } else {
+                checkState(DSLImpl.this.contentTypeType != null,
+                        "either explicit content type instance or " +
+                        "content type class must be specified");
+                contentTypeProvider = (Provider<TextContentType>) binder.getProvider(
+                        DSLImpl.this.contentTypeType);
+            }
+
+            final Provider<T> provider = () -> create(contentTypeProvider);
             if (DSLImpl.this.servletCtxProvider != null) {
                 final Provider<ServletContext> realProvider = binder.getProvider(
                         ServletContext.class);
@@ -174,6 +194,13 @@ final class DSLImpl implements
     public ChooseTargetType containing(TextContentType contentType) {
         checkArgument(contentType != null, "contentType is null");
         this.contentType = contentType;
+        return this;
+    }
+
+    @Override
+    public ChooseTargetType containing(Class<? extends TextContentType> contentTypeType) {
+        checkArgument(contentTypeType != null, "contentTypeType is null");
+        this.contentTypeType = contentTypeType;
         return this;
     }
 

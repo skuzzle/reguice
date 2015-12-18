@@ -1,10 +1,16 @@
 package de.skuzzle.inject.conf;
 
+import com.google.inject.Binder;
+
+import de.skuzzle.inject.conf.Resources.ChooseContentType;
 import de.skuzzle.inject.conf.Resources.ChooseTargetType;
 
 /**
  * This interfaces controls how the content of a {@link TextResource} is mapped
- * to a concrete instance of some object.
+ * to a concrete instance of some object. It is registered during the fluent
+ * configuration of a resource binding. If you provide an instance to
+ * {@link ChooseContentType#containing(TextContentType)} then injection will be
+ * requested at the {@link Binder}.
  *
  * @author Simon Taddiken
  */

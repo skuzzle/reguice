@@ -1,18 +1,13 @@
 package de.skuzzle.inject.conf;
 
 import static org.junit.Assert.assertSame;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 
 import javax.inject.Provider;
 
@@ -27,7 +22,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.google.inject.Binder;
 import com.google.inject.Injector;
 import com.google.inject.Key;
-import com.google.inject.Singleton;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.binder.ScopedBindingBuilder;
 
@@ -62,68 +56,6 @@ public class DSLImplTest {
     }
 
     @Test
-    public void testConfigureClassPathResource() throws Exception {
-        final ClassLoader clMock = mock(ClassLoader.class);
-        final TextContentType contentType = mock(TextContentType.class);
-
-        this.subject.buffered()
-                .classPathResource("foo/bar", clMock)
-                .containing(contentType)
-                .to(getClass())
-                .in(Singleton.class)
-                .using(this.binder);
-
-        verify(this.scopedBuilder).in(Singleton.class);
-        verify(this.binder).bind(this.selfType);
-
-        final ArgumentCaptor<Provider> captor = ArgumentCaptor.forClass(Provider.class);
-        verify(this.linkedBuilder).toProvider(captor.capture());
-        verify(this.factory).newClassPathResource("foo/bar", clMock, null);
-
-        final Provider prov = captor.getValue();
-        assertSame(this, prov.get());
-    }
-
-    @Test
-    public void testBindClassPathResourceContextCL() throws Exception {
-        this.subject.reloadable()
-                .classPathResource("foo/bar")
-                .encodedWith("UTF-8")
-                .containingProperties()
-                .to(getClass())
-                .using(this.binder);
-
-        verify(this.factory).newClassPathResource("foo/bar",
-                Thread.currentThread().getContextClassLoader(), Charset.forName("UTF-8"));
-    }
-
-    @Test
-    public void testConfigureServletResource() throws Exception {
-        final TextContentType contentType = mock(TextContentType.class);
-
-        when(contentType.createInstance(Mockito.eq(DSLImplTest.class),
-                Mockito.isA(CachedTextResource.class))).thenReturn(this);
-
-        this.subject.constant()
-                .servletResource("foo/bar")
-                .encodedWith(StandardCharsets.UTF_8)
-                .containing(contentType)
-                .to(getClass())
-                .using(this.binder);
-
-        verify(this.scopedBuilder, never()).in(any(Class.class));
-        verify(this.binder).bind(this.selfType);
-
-        final ArgumentCaptor<Provider> captor = ArgumentCaptor.forClass(Provider.class);
-        verify(this.linkedBuilder).toProvider(captor.capture());
-        verify(this.factory).newServletResource(eq("foo/bar"), any(Provider.class),
-                eq(StandardCharsets.UTF_8));
-
-        final Provider prov = captor.getValue();
-        assertSame(this, prov.get());
-    }
-
-    @Test
     public void testBindCustomResource() throws Exception {
         final TextContentType contentType = mock(TextContentType.class);
         final TextResource resource = mock(TextResource.class);
@@ -141,19 +73,6 @@ public class DSLImplTest {
 
         final Provider prov = captor.getValue();
         assertSame(this, prov.get());
-    }
-
-    @Test
-    public void testBindNioResource() throws Exception {
-        final Path path = mock(Path.class);
-        this.subject.reloadable()
-                .pathResource(path)
-                .encodedWithSystemDefaultCharset()
-                .containingJson()
-                .to(getClass())
-                .using(this.binder);
-
-        verify(this.factory).newNioResource(path, Charset.defaultCharset());
     }
 
     @Test
@@ -216,7 +135,7 @@ public class DSLImplTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullTest8() throws Exception {
-        this.subject.containing(null);
+        this.subject.containing((Class) null);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -257,5 +176,10 @@ public class DSLImplTest {
     @Test(expected = IllegalArgumentException.class)
     public void testNullTest16() throws Exception {
         this.subject.to(null, "");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullTest17() throws Exception {
+        this.subject.containing((TextContentType) null);
     }
 }
