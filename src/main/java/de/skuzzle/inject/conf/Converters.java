@@ -57,9 +57,6 @@ final class Converters {
 
     @SuppressWarnings("unchecked")
     public static <T> T parseString(Class<T> targetType, String s) {
-        if (targetType == String.class) {
-            return targetType.cast(s);
-        }
         final Function<String, T> prim = (Function<String, T>) PARSERS.get(targetType);
         if (prim != null) {
             return prim.apply(s);
