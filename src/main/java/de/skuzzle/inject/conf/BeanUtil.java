@@ -6,26 +6,8 @@ import java.util.function.Function;
 
 class BeanUtil {
 
-    private static final Map<Class<?>, Function<String, ?>> PARSERS;
     private static final Map<Class<?>, Function<Number, ?>> NUMBER_MAPPER;
     static {
-        PARSERS = new HashMap<>();
-        PARSERS.put(Byte.class, Byte::parseByte);
-        PARSERS.put(Byte.TYPE, Byte::parseByte);
-        PARSERS.put(Short.class, Short::parseShort);
-        PARSERS.put(Short.TYPE, Short::parseShort);
-        PARSERS.put(Integer.class, Integer::parseInt);
-        PARSERS.put(Integer.TYPE, Integer::parseInt);
-        PARSERS.put(Long.class, Long::parseLong);
-        PARSERS.put(Long.TYPE, Long::parseLong);
-        PARSERS.put(Float.class, Float::parseFloat);
-        PARSERS.put(Float.TYPE, Float::parseFloat);
-        PARSERS.put(Double.class, Double::parseDouble);
-        PARSERS.put(Double.TYPE, Double::parseDouble);
-        PARSERS.put(Boolean.class, Boolean::parseBoolean);
-        PARSERS.put(Boolean.TYPE, Boolean::parseBoolean);
-        PARSERS.put(String.class, Function.identity());
-
         NUMBER_MAPPER = new HashMap<>();
         NUMBER_MAPPER.put(Byte.class, Number::byteValue);
         NUMBER_MAPPER.put(Byte.TYPE, Number::byteValue);
@@ -41,9 +23,8 @@ class BeanUtil {
         NUMBER_MAPPER.put(Double.TYPE, Number::doubleValue);
     }
 
-    public Object coerceSimpleType(String value, Class<?> targetType) {
-        final Function<String, ?> parser = PARSERS.get(targetType);
-        return parser.apply(value);
+    public Object coerceType(String value, Class<?> targetType) {
+        return Converters.parseString(targetType, value);
     }
 
     public Object coerceNumber(Number number, Class<?> targetType) {

@@ -95,7 +95,7 @@ import com.google.inject.Singleton;
  */
 public interface Resources {
 
-    public static ChoseBufferType bind() {
+    public static ChooseBufferType bind() {
         final ResourceUtil util = new ResourceUtil();
         final BeanUtil beanUtil = new BeanUtil();
         final TextResourceFactory factory = new TextResourceFactoryImpl(util);
@@ -104,56 +104,64 @@ public interface Resources {
         return new DSLImpl(factory, contentTypeFactory);
     }
 
-    interface ChoseBufferType extends ChoseResources {
-        ChoseResources buffered();
-
-        ChoseResources reloadable();
-
-        ChoseResources constant();
+    public static ChooseBufferType build() {
+        return bind();
     }
 
-    interface ChoseResources {
-        ChoseContentTypeAndCharset classPathResource(String path);
+    interface ChooseBufferType extends ChooseResources {
+        ChooseResources buffered();
 
-        ChoseContentTypeAndCharset classPathResource(String path, ClassLoader cl);
+        ChooseResources reloadable();
 
-        ChoseContentTypeAndCharset servletResource(String path);
+        ChooseResources constant();
 
-        ChoseContentTypeAndCharset fileResource(File file);
-
-        ChoseContentTypeAndCharset pathResource(Path path);
-
-        ChoseContentTypeAndCharset urlResource(URL url);
-
-        ChoseContentTypeAndCharset urlResource(String url);
-
-        ChoseContentType resource(TextResource resource);
+        ChooseResources cached(CachingStrategy strategy);
     }
 
-    interface ChoseContentTypeAndCharset extends ChoseContentType {
-        ChoseContentType encodedWith(String charset);
+    interface ChooseResources {
+        ChooseContentTypeAndCharset classPathResource(String path);
 
-        ChoseContentType encodedWith(Charset charset);
+        ChooseContentTypeAndCharset classPathResource(String path, ClassLoader cl);
 
-        ChoseContentType encodedWithSystemDefaultCharset();
+        ChooseContentTypeAndCharset servletResource(String path);
 
-        ChoseContentType encodedWithProvidedCharset();
+        ChooseContentTypeAndCharset fileResource(File file);
+
+        ChooseContentTypeAndCharset pathResource(Path path);
+
+        ChooseContentTypeAndCharset urlResource(URL url);
+
+        ChooseContentTypeAndCharset urlResource(String url);
+
+        ChooseContentType resource(TextResource resource);
     }
 
-    interface ChoseContentType {
-        ChoseTargetType containingText();
+    interface ChooseContentTypeAndCharset extends ChooseContentType {
+        ChooseContentType encodedWith(String charset);
 
-        ChoseTargetType containingJson();
-        ChoseTargetType containingJson(GsonBuilder builder);
+        ChooseContentType encodedWith(Charset charset);
 
-        ChoseTargetType containingXml();
+        ChooseContentType encodedWithSystemDefaultCharset();
 
-        ChoseTargetType containingProperties();
-
-        ChoseTargetType containing(TextContentType contentType);
+        ChooseContentType encodedWithProvidedCharset();
     }
 
-    interface ChoseTargetType {
+    interface ChooseContentType {
+        ChooseTargetType containingText();
+
+        ChooseTargetType containingJson();
+
+        ChooseTargetType containingJson(GsonBuilder builder);
+
+        ChooseTargetType containingXml();
+
+        ChooseTargetType containingProperties();
+
+        ChooseTargetType containing(TextContentType contentType);
+    }
+
+    interface ChooseTargetType {
+
         <T> FinalizeWithScope<T> to(Key<T> key);
 
         <T> FinalizeWithScope<T> to(Class<T> type);
@@ -162,6 +170,7 @@ public interface Resources {
     }
 
     interface FinalizeWithScope<T> extends Finalize<T> {
+        T create();
         Finalize<T> in(Class<? extends Annotation> scope);
     }
 

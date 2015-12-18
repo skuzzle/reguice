@@ -1,6 +1,7 @@
 package de.skuzzle.inject.conf;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
@@ -19,26 +20,27 @@ import com.google.inject.Key;
 import com.google.inject.binder.ScopedBindingBuilder;
 import com.google.inject.name.Names;
 
-import de.skuzzle.inject.conf.Resources.ChoseBufferType;
-import de.skuzzle.inject.conf.Resources.ChoseContentType;
-import de.skuzzle.inject.conf.Resources.ChoseContentTypeAndCharset;
-import de.skuzzle.inject.conf.Resources.ChoseResources;
-import de.skuzzle.inject.conf.Resources.ChoseTargetType;
+import de.skuzzle.inject.conf.Resources.ChooseBufferType;
+import de.skuzzle.inject.conf.Resources.ChooseContentType;
+import de.skuzzle.inject.conf.Resources.ChooseContentTypeAndCharset;
+import de.skuzzle.inject.conf.Resources.ChooseResources;
+import de.skuzzle.inject.conf.Resources.ChooseTargetType;
 import de.skuzzle.inject.conf.Resources.Finalize;
 import de.skuzzle.inject.conf.Resources.FinalizeWithScope;
 
-final class DSLImpl implements ChoseBufferType,
-        ChoseResources,
-        ChoseContentType,
-        ChoseContentTypeAndCharset,
-        ChoseTargetType {
+final class DSLImpl implements
+        ChooseBufferType,
+        ChooseResources,
+        ChooseContentType,
+        ChooseContentTypeAndCharset,
+        ChooseTargetType {
 
     private TextContentType contentType;
     private Charset charset;
-    private Function<TextResource, TextResource> wrapper = Function.identity();
     private Function<Charset, TextResource> resourceFactory;
-
     private MutableProvider<ServletContext> servletCtxProvider;
+    // null until set
+    private CachingStrategy cacheStrategy;
 
     private final TextResourceFactory textResourceFactory;
     private final ContentTypeFactory contentTypeFactory;
@@ -57,6 +59,7 @@ final class DSLImpl implements ChoseBufferType,
 
         @Override
         public T get() {
+            checkState(this.realProvider != null, "ServletContext not available");
             return this.realProvider.get();
         }
     }
@@ -71,6 +74,15 @@ final class DSLImpl implements ChoseBufferType,
         }
 
         @Override
+        @SuppressWarnings("unchecked")
+        public T create() {
+            final TextResource actual = createResource();
+            final Class<T> targetType = (Class<T>) this.targetKey
+                    .getTypeLiteral().getRawType();
+            return DSLImpl.this.contentType.createInstance(targetType, actual);
+        }
+
+        @Override
         public Finalize<T> in(Class<? extends Annotation> scope) {
             checkArgument(scope != null, "scope is null");
             this.scope = scope;
@@ -78,19 +90,11 @@ final class DSLImpl implements ChoseBufferType,
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         public void using(Binder binder) {
             checkArgument(binder != null, "binder is null");
 
-            final TextResource root = DSLImpl.this.resourceFactory.apply(
-                    DSLImpl.this.charset);
-
-            final TextResource actual = DSLImpl.this.wrapper.apply(root);
-            final Class<T> targetType = (Class<T>) this.targetKey
-                    .getTypeLiteral().getRawType();
-            final Provider<T> provider = () -> DSLImpl.this.contentType.createInstance(
-                    targetType, actual);
-
+            binder.requestInjection(DSLImpl.this.contentType);
+            final Provider<T> provider = this::create;
             if (DSLImpl.this.servletCtxProvider != null) {
                 final Provider<ServletContext> realProvider = binder.getProvider(
                         ServletContext.class);
@@ -104,7 +108,17 @@ final class DSLImpl implements ChoseBufferType,
                 builder.in(this.scope);
             }
         }
+    }
 
+    private TextResource createResource() {
+        final TextResource root = DSLImpl.this.resourceFactory.apply(
+                DSLImpl.this.charset);
+
+        if (this.cacheStrategy != null) {
+            return this.textResourceFactory.cache(root, this.cacheStrategy);
+        }
+
+        return root;
     }
 
     @Override
@@ -127,70 +141,70 @@ final class DSLImpl implements ChoseBufferType,
     }
 
     @Override
-    public ChoseTargetType containingJson() {
+    public ChooseTargetType containingJson() {
         this.contentType = this.contentTypeFactory.newJsonContentType(new GsonBuilder());
         return this;
     }
 
     @Override
-    public ChoseTargetType containingJson(GsonBuilder builder) {
+    public ChooseTargetType containingJson(GsonBuilder builder) {
         checkArgument(builder != null, "builder is null");
         this.contentType = this.contentTypeFactory.newJsonContentType(builder);
         return this;
     }
 
     @Override
-    public ChoseTargetType containingXml() {
+    public ChooseTargetType containingXml() {
         throw new UnsupportedOperationException("not implemented yet");
     }
 
     @Override
-    public ChoseTargetType containingText() {
+    public ChooseTargetType containingText() {
         this.contentType = this.contentTypeFactory.newStringContentType();
         return this;
     }
 
     @Override
-    public ChoseTargetType containingProperties() {
+    public ChooseTargetType containingProperties() {
         this.contentType = this.contentTypeFactory.newPropertiesContentType();
         return this;
     }
 
     @Override
-    public ChoseTargetType containing(TextContentType contentType) {
+    public ChooseTargetType containing(TextContentType contentType) {
         checkArgument(contentType != null, "contentType is null");
         this.contentType = contentType;
         return this;
     }
 
     @Override
-    public ChoseContentType encodedWith(Charset charset) {
+    public ChooseContentType encodedWith(Charset charset) {
         checkArgument(charset != null, "charset is null");
         this.charset = charset;
         return this;
     }
 
     @Override
-    public ChoseContentType encodedWith(String charset) {
+    public ChooseContentType encodedWith(String charset) {
         checkArgument(charset != null, "charset is null");
         this.charset = Charset.forName(charset);
         return this;
     }
 
     @Override
-    public ChoseContentType encodedWithSystemDefaultCharset() {
+    public ChooseContentType encodedWithSystemDefaultCharset() {
         this.charset = Charset.defaultCharset();
         return this;
     }
 
     @Override
-    public ChoseContentType encodedWithProvidedCharset() {
+    public ChooseContentType encodedWithProvidedCharset() {
         this.charset = null;
         return this;
     }
 
     @Override
-    public ChoseContentTypeAndCharset classPathResource(String path) {
+    public ChooseContentTypeAndCharset classPathResource(String path) {
         checkArgument(path != null, "path is null");
         final ClassLoader cl = Thread.currentThread().getContextClassLoader();
         this.resourceFactory = cs -> this.textResourceFactory.newClassPathResource(
@@ -199,7 +213,7 @@ final class DSLImpl implements ChoseBufferType,
     }
 
     @Override
-    public ChoseContentTypeAndCharset classPathResource(String path, ClassLoader cl) {
+    public ChooseContentTypeAndCharset classPathResource(String path, ClassLoader cl) {
         checkArgument(path != null, "path is null");
         checkArgument(cl != null, "cl is null");
         this.resourceFactory = cs -> this.textResourceFactory.newClassPathResource(
@@ -208,7 +222,7 @@ final class DSLImpl implements ChoseBufferType,
     }
 
     @Override
-    public ChoseContentTypeAndCharset servletResource(String path) {
+    public ChooseContentTypeAndCharset servletResource(String path) {
         checkArgument(path != null, "path is null");
         this.servletCtxProvider = new MutableProvider<ServletContext>();
         this.resourceFactory = cs -> this.textResourceFactory.newServletResource(path,
@@ -217,7 +231,7 @@ final class DSLImpl implements ChoseBufferType,
     }
 
     @Override
-    public ChoseContentTypeAndCharset fileResource(File file) {
+    public ChooseContentTypeAndCharset fileResource(File file) {
         checkArgument(file != null, "file is null");
         this.resourceFactory = cs -> this.textResourceFactory.newNioResource(
                 file.toPath(), cs);
@@ -225,21 +239,21 @@ final class DSLImpl implements ChoseBufferType,
     }
 
     @Override
-    public ChoseContentTypeAndCharset pathResource(Path path) {
+    public ChooseContentTypeAndCharset pathResource(Path path) {
         checkArgument(path != null, "path is null");
         this.resourceFactory = cs -> this.textResourceFactory.newNioResource(path, cs);
         return this;
     }
 
     @Override
-    public ChoseContentTypeAndCharset urlResource(URL url) {
+    public ChooseContentTypeAndCharset urlResource(URL url) {
         checkArgument(url != null, "url is null");
         this.resourceFactory = cs -> this.textResourceFactory.newURLResource(url, cs);
         return this;
     }
 
     @Override
-    public ChoseContentTypeAndCharset urlResource(String url) {
+    public ChooseContentTypeAndCharset urlResource(String url) {
         checkArgument(url != null, "url is null");
         try {
             final URL u = new URL(url);
@@ -251,27 +265,34 @@ final class DSLImpl implements ChoseBufferType,
     }
 
     @Override
-    public ChoseContentTypeAndCharset resource(TextResource resource) {
+    public ChooseContentTypeAndCharset resource(TextResource resource) {
         checkArgument(resource != null, "resource is null");
         this.resourceFactory = cs -> resource;
         return this;
     }
 
     @Override
-    public ChoseResources buffered() {
-        this.wrapper = BufferedTextResource::wrap;
+    public ChooseResources cached(CachingStrategy strategy) {
+        checkArgument(strategy != null, "strategy is null");
+        this.cacheStrategy = strategy;
         return this;
     }
 
     @Override
-    public ChoseResources reloadable() {
-        this.wrapper = Function.identity();
+    public ChooseResources buffered() {
+        this.cacheStrategy = new TimestampCacheStrategy();
         return this;
     }
 
     @Override
-    public ChoseResources constant() {
-        this.wrapper = ConstantTextResource::wrap;
+    public ChooseResources reloadable() {
+        this.cacheStrategy = null;
+        return this;
+    }
+
+    @Override
+    public ChooseResources constant() {
+        this.cacheStrategy = ConstantCacheStrategy.getInstance();
         return this;
     }
 }

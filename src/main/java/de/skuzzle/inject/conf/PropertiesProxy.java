@@ -26,7 +26,7 @@ class PropertiesProxy implements InvocationHandler {
                     propertyName));
         }
         if (result instanceof String) {
-            return this.util.coerceSimpleType(result.toString(), method.getReturnType());
+            return this.util.coerceType(result.toString(), method.getReturnType());
         }
         return result;
     }

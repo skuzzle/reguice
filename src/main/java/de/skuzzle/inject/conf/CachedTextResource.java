@@ -3,6 +3,7 @@ package de.skuzzle.inject.conf;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.CharBuffer;
@@ -10,18 +11,20 @@ import java.nio.CharBuffer;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 
-class ConstantTextResource implements TextResource {
+class CachedTextResource implements TextResource {
 
     private final TextResource wrapped;
     private String bufferedString;
     private byte[] bufferedBytes;
+    private final CachingStrategy cacheStrategy;
 
-    ConstantTextResource(TextResource wrapped) {
+    CachedTextResource(TextResource wrapped, CachingStrategy strategy) {
         this.wrapped = wrapped;
+        this.cacheStrategy = strategy;
     }
 
-    static TextResource wrap(TextResource resource) {
-        return new ConstantTextResource(resource);
+    static TextResource wrap(TextResource resource, CachingStrategy cacheStrategy) {
+        return new CachedTextResource(resource, cacheStrategy);
     }
 
     @Override
@@ -32,11 +35,18 @@ class ConstantTextResource implements TextResource {
     }
 
     @Override
+    public long writeTo(OutputStream out) throws IOException {
+        try (InputStream in = openBinaryStream()) {
+            return ByteStreams.copy(in, out);
+        }
+    }
+
+    @Override
     public final synchronized InputStream openBinaryStream() throws IOException {
         if (this.bufferedBytes == null || rebufferBytes()) {
             try (InputStream stream = this.wrapped.openBinaryStream()) {
                 this.bufferedBytes = ByteStreams.toByteArray(stream);
-                newBytesBuffered();
+                this.cacheStrategy.binaryCacheRefreshed(this, this.bufferedBytes);
             }
         }
         return new ByteArrayInputStream(this.bufferedBytes);
@@ -47,26 +57,18 @@ class ConstantTextResource implements TextResource {
         if (this.bufferedString == null || rebufferChars()) {
             try (Reader reader = this.wrapped.openStream()) {
                 this.bufferedString = CharStreams.toString(reader);
-                newCharsBuffered();
+                this.cacheStrategy.textCacheRefreshed(this, this.bufferedString);
             }
         }
         return new StringReader(this.bufferedString);
     }
 
-    protected void newBytesBuffered() throws IOException {
-        // to be overridden by subclasses
+    protected final boolean rebufferBytes() throws IOException {
+        return this.cacheStrategy.refreshBinaryCache(this);
     }
 
-    protected void newCharsBuffered() throws IOException {
-        // to be overridden by subclasses
-    }
-
-    protected boolean rebufferBytes() throws IOException {
-        return false;
-    }
-
-    protected boolean rebufferChars() throws IOException {
-        return false;
+    protected final boolean rebufferChars() throws IOException {
+        return this.cacheStrategy.refreshTextCache(this);
     }
 
     @Override

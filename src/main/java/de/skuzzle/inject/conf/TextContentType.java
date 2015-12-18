@@ -1,6 +1,6 @@
 package de.skuzzle.inject.conf;
 
-import de.skuzzle.inject.conf.Resources.ChoseTargetType;
+import de.skuzzle.inject.conf.Resources.ChooseTargetType;
 
 /**
  * This interfaces controls how the content of a {@link TextResource} is mapped
@@ -13,7 +13,7 @@ public interface TextContentType {
     /**
      * Creates an instance of type T from the given resource. The type that is
      * passed here, is the one that the user passed to
-     * {@link ChoseTargetType#to(Class)} when binding a resource.
+     * {@link ChooseTargetType#to(Class)} when binding a resource.
      *
      * @param <T> The result type.
      * @param type The type to create an instance of.

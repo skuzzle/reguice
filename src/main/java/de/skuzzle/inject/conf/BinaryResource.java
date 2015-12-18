@@ -2,6 +2,7 @@ package de.skuzzle.inject.conf;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Represents a resource for which a binary stream can be obtained.
@@ -24,9 +25,18 @@ public interface BinaryResource {
      * </pre>
      *
      * @return A new InputStream to read content of the resource.
-     * @throws IOException
+     * @throws IOException If an IO error occurs.
      */
     InputStream openBinaryStream() throws IOException;
+
+    /**
+     * Writes the binary content of this resource to the specified output stream.
+     *
+     * @param out The target stream.
+     * @return The number of bytes that have been copied.
+     * @throws IOException If an IO error occurs.
+     */
+    long writeTo(OutputStream out) throws IOException;
 
     /**
      * Gets the modification date of this resource. Depending on the actual

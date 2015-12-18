@@ -2,6 +2,7 @@ package de.skuzzle.inject.conf;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.CharBuffer;
@@ -27,6 +28,11 @@ abstract class AbstractURLResource implements TextResource {
     @Override
     public final InputStream openBinaryStream() throws IOException {
         return this.util.newInputStream(getURL());
+    }
+
+    @Override
+    public long writeTo(OutputStream out) throws IOException {
+        return this.util.writeFromSource(this, out);
     }
 
     @Override

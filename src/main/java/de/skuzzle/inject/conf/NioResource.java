@@ -1,7 +1,10 @@
 package de.skuzzle.inject.conf;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -17,6 +20,12 @@ final class NioResource implements TextResource {
         this.util = util;
         this.path = path;
         this.charset = charset;
+    }
+
+    @Override
+    public long writeTo(OutputStream out) throws IOException {
+        checkArgument(out != null);
+        return this.util.writeFromSource(this, out);
     }
 
     @Override

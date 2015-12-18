@@ -3,6 +3,7 @@ package de.skuzzle.inject.conf;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.net.JarURLConnection;
 import java.net.URL;
@@ -11,6 +12,8 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import com.google.common.io.ByteStreams;
 
 class ResourceUtil {
 
@@ -62,9 +65,17 @@ class ResourceUtil {
         return new InputStreamReader(stream, charset);
     }
 
-    public int readFromSource(TextResource resource, CharBuffer buffer) throws IOException {
+    public int readFromSource(TextResource resource, CharBuffer buffer)
+            throws IOException {
         try (Reader reader = resource.openStream()) {
             return reader.read(buffer);
+        }
+    }
+
+    public long writeFromSource(BinaryResource resource, OutputStream target)
+            throws IOException {
+        try (InputStream in = resource.openBinaryStream()) {
+            return ByteStreams.copy(in, target);
         }
     }
 }

@@ -1,0 +1,10 @@
+{
+    foo: 1337,
+    pi: 3.1415, 
+    bar: 'xyz', 
+    cool: true, 
+    array: [1, 2, 3], 
+    sample: { 
+        object: 'abc' 
+    } 
+}

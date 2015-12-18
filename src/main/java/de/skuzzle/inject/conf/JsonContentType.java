@@ -33,7 +33,8 @@ class JsonContentType implements TextContentType {
                 final JsonElement element = parser.parse(reader);
 
                 checkArgument(element.isJsonObject(),
-                        "top level JSON element must be an object");
+                        "top level JSON element must be an object when binding to " +
+                        "an interface");
 
                 final InvocationHandler handler = new JsonProxy(
                         element.getAsJsonObject(), this.beanUtil);

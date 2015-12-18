@@ -16,6 +16,11 @@ final class TextResourceFactoryImpl implements TextResourceFactory {
     }
 
     @Override
+    public TextResource cache(TextResource resource, CachingStrategy strategy) {
+        return new CachedTextResource(resource, strategy);
+    }
+
+    @Override
     public TextResource newClassPathResource(String path, ClassLoader cl,
             Charset charset) {
         return new ClassPathResource(this.util, cl, path, charset);
@@ -37,4 +42,8 @@ final class TextResourceFactoryImpl implements TextResourceFactory {
         return new NioResource(this.util, path, charset);
     }
 
+    @Override
+    public TextResource newStringResource(String text) {
+        return new StringTextResource(text, this.util);
+    }
 }

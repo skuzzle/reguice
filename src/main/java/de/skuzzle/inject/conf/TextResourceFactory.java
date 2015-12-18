@@ -14,6 +14,8 @@ import javax.servlet.ServletContext;
  */
 interface TextResourceFactory {
 
+    TextResource cache(TextResource resource, CachingStrategy strategy);
+
     TextResource newClassPathResource(String path, ClassLoader cl, Charset charset);
 
     TextResource newServletResource(String path, Provider<ServletContext> servletContext,
@@ -22,4 +24,6 @@ interface TextResourceFactory {
     TextResource newURLResource(URL url, Charset charset);
 
     TextResource newNioResource(Path path, Charset charset);
+
+    TextResource newStringResource(String text);
 }

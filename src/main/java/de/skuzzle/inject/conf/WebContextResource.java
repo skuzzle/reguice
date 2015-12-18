@@ -1,5 +1,7 @@
 package de.skuzzle.inject.conf;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
@@ -23,6 +25,7 @@ final class WebContextResource extends AbstractURLResource {
     @Override
     protected URL getURL() throws IOException {
         final ServletContext ctx = this.servletContext.get();
+        checkState(ctx != null, "ServletContext not available");
         final URL url = ctx.getResource(this.resourcePath);
         if (url == null) {
             resourceNotFound();

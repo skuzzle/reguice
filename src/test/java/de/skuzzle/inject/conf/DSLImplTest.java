@@ -25,6 +25,7 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.inject.Binder;
+import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Singleton;
 import com.google.inject.binder.LinkedBindingBuilder;
@@ -37,6 +38,8 @@ public class DSLImplTest {
     private TextResourceFactory factory;
     @Mock
     private Binder binder;
+    @Mock
+    private Injector injector;
     @Mock
     private LinkedBindingBuilder<DSLImplTest> linkedBuilder;
     @Mock
@@ -55,15 +58,13 @@ public class DSLImplTest {
 
         when(this.binder.bind(this.selfType)).thenReturn(this.linkedBuilder);
         when(this.linkedBuilder.toProvider(Mockito.any(Provider.class))).thenReturn(this.scopedBuilder);
+        when(this.binder.getProvider(Injector.class)).thenReturn(() -> this.injector);
     }
 
     @Test
     public void testConfigureClassPathResource() throws Exception {
         final ClassLoader clMock = mock(ClassLoader.class);
         final TextContentType contentType = mock(TextContentType.class);
-
-        when(contentType.createInstance(Mockito.eq(DSLImplTest.class),
-                Mockito.isA(BufferedTextResource.class))).thenReturn(this);
 
         this.subject.buffered()
                 .classPathResource("foo/bar", clMock)
@@ -101,7 +102,7 @@ public class DSLImplTest {
         final TextContentType contentType = mock(TextContentType.class);
 
         when(contentType.createInstance(Mockito.eq(DSLImplTest.class),
-                Mockito.isA(ConstantTextResource.class))).thenReturn(this);
+                Mockito.isA(CachedTextResource.class))).thenReturn(this);
 
         this.subject.constant()
                 .servletResource("foo/bar")

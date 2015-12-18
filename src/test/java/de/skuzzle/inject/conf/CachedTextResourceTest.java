@@ -26,7 +26,7 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ConstantTextResourceTest {
+public class CachedTextResourceTest {
 
     @Mock
     private TextResource wrapped;
@@ -35,7 +35,8 @@ public class ConstantTextResourceTest {
 
     @Before
     public void setUp() throws Exception {
-        this.subject = ConstantTextResource.wrap(this.wrapped);
+        this.subject = CachedTextResource.wrap(this.wrapped,
+                ConstantCacheStrategy.getInstance());
     }
 
     @Test

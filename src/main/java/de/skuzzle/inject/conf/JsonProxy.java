@@ -31,6 +31,7 @@ class JsonProxy implements InvocationHandler {
         checkArgument(args == null, "mapped methods must not have parameters");
         final String propertyName = this.beanUtil.getPropertyName(method.getName());
         final JsonElement element = this.root.get(propertyName);
+
         return getObject(propertyName, element, method.getReturnType());
     }
 
@@ -62,8 +63,8 @@ class JsonProxy implements InvocationHandler {
         } else if (primitive.isNumber()) {
             return this.beanUtil.coerceNumber(primitive.getAsNumber(), targetType);
         } else if (primitive.isString()) {
-            checkArgument(targetType.isAssignableFrom(String.class));
-            return primitive.getAsString();
+            return this.beanUtil.coerceType(primitive.getAsString(),
+                    targetType);
         }
         throw new AssertionError();
     }

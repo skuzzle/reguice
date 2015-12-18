@@ -59,7 +59,11 @@
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 		</dependency>
-
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
+        </dependency>
+        
 		<!-- Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -71,6 +75,7 @@
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
 		</dependency>
+		
 		<!-- javax -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
