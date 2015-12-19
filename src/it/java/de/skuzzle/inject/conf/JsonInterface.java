@@ -10,6 +10,7 @@ public interface JsonInterface {
     SubType getSample();
     Object getUnknown();
     long getWithParameter(Object object);
+    SampleObject getSampleObject();
 
     public interface SubType {
         Object getObject();

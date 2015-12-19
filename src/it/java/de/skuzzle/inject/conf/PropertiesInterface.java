@@ -4,4 +4,5 @@ public interface PropertiesInterface {
     String getFoo();
     int getIntValue();
     double getDoubleValue();
+    SampleObject getSampleObject();
 }
