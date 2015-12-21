@@ -17,7 +17,7 @@ final class TextResourceFactoryImpl implements TextResourceFactory {
 
     @Override
     public TextResource cache(TextResource resource, CachingStrategy strategy) {
-        return new CachedTextResource(resource, strategy);
+        return new CachedTextResource(resource, strategy, this.util);
     }
 
     @Override

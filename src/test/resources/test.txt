@@ -1,2 +1,2 @@
-just a text file
+just a text file öäü
 :D

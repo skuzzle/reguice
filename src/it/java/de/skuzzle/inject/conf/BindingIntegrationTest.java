@@ -13,6 +13,7 @@ import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 import javax.inject.Inject;
@@ -106,11 +107,13 @@ public class BindingIntegrationTest {
                     writeString("test");
                     Resources.bind().cached(new TimestampCacheStrategy())
                             .fileResource(BindingIntegrationTest.this.tempFile)
+                            .encodedWithSystemDefaultCharset()
                             .containingText()
                             .to(String.class, "tempFile")
                             .using(binder());
                     Resources.bind().constant()
                             .fileResource(BindingIntegrationTest.this.tempFile)
+                            .encodedWithProvidedCharset()
                             .containingText()
                             .to(String.class, "bufferedFile")
                             .using(binder());
@@ -127,12 +130,14 @@ public class BindingIntegrationTest {
 
                 Resources.bind().buffered()
                         .classPathResource("test.json")
+                        .encodedWith(StandardCharsets.ISO_8859_1)
                         .containingJson()
                         .to(JsonInterface.class)
                         .using(binder());
 
                 Resources.bind().cached(new TestCachingStrategy())
                         .classPathResource("test.txt")
+                        .encodedWith("UTF-8")
                         .containingText()
                         .to(String.class)
                         .using(binder());
@@ -170,13 +175,18 @@ public class BindingIntegrationTest {
     }
 
     @Test
+    public void testIsoEncoding() throws Exception {
+        assertEquals("xyzö", this.jsonContent.getBar());
+    }
+
+    @Test
     public void testInterfaceObjectFromJson() throws Exception {
         assertEquals("abc", this.jsonContent.getSample().getObject());
     }
 
     @Test
     public void testPlainText() throws Exception {
-        assertEquals("just a text file\n:D", this.textContent);
+        assertEquals("just a text file öäü\n:D", this.textContent);
     }
 
     @Test

@@ -1,7 +1,7 @@
 {
     foo: 1337,
     pi: 3.1415, 
-    bar: 'xyz', 
+    bar: 'xyzö', 
     cool: true, 
     array: [1, 2, 3], 
     sample: { 

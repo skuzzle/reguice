@@ -17,28 +17,23 @@ class CachedTextResource implements TextResource {
     private String bufferedString;
     private byte[] bufferedBytes;
     private final CachingStrategy cacheStrategy;
+    private final ResourceUtil resourceUtil;
 
-    CachedTextResource(TextResource wrapped, CachingStrategy strategy) {
+    CachedTextResource(TextResource wrapped, CachingStrategy strategy,
+            ResourceUtil resourceUtil) {
         this.wrapped = wrapped;
         this.cacheStrategy = strategy;
-    }
-
-    static TextResource wrap(TextResource resource, CachingStrategy cacheStrategy) {
-        return new CachedTextResource(resource, cacheStrategy);
+        this.resourceUtil = resourceUtil;
     }
 
     @Override
     public int read(CharBuffer cb) throws IOException {
-        try (Reader reader = openStream()) {
-            return reader.read(cb);
-        }
+        return this.resourceUtil.readFromSource(this, cb);
     }
 
     @Override
     public long writeTo(OutputStream out) throws IOException {
-        try (InputStream in = openBinaryStream()) {
-            return ByteStreams.copy(in, out);
-        }
+        return this.resourceUtil.writeFromSource(this, out);
     }
 
     @Override
