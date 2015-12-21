@@ -104,10 +104,6 @@ public interface Resources {
         return new DSLImpl(factory, contentTypeFactory);
     }
 
-    public static ChooseBufferType build() {
-        return bind();
-    }
-
     interface ChooseBufferType extends ChooseResources {
         ChooseResources buffered();
 
