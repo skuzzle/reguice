@@ -6,6 +6,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -13,10 +17,13 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.servlet.ServletContext;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -26,6 +33,9 @@ import com.google.inject.Guice;
 import com.google.inject.Singleton;
 
 public class BindingIntegrationTest {
+
+    @Rule
+    public final TemporaryFolder tempFolder = new TemporaryFolder();
 
     @Inject
     private JsonInterface jsonContent;
@@ -40,6 +50,14 @@ public class BindingIntegrationTest {
     private String fromServlet;
     @Inject
     private Object object;
+    @Inject
+    @Named("tempFile")
+    private Provider<String> tempString;
+    @Inject
+    @Named("bufferedFile")
+    private Provider<String> bufferedString;
+
+    private File tempFile;
 
     private static final Object TEST_OBJECT = new Object();
 
@@ -53,7 +71,9 @@ public class BindingIntegrationTest {
     }
 
     @Before
-    public void setup() {
+    public void setup() throws IOException {
+        this.tempFile = this.tempFolder.newFile();
+
         Guice.createInjector(new AbstractModule() {
 
             @Override
@@ -82,8 +102,21 @@ public class BindingIntegrationTest {
                             .containing(TestTextContentType.class)
                             .to(Object.class)
                             .using(binder());
-                } catch (final URISyntaxException e) {
-                    e.printStackTrace();
+
+                    writeString("test");
+                    Resources.bind().cached(new TimestampCacheStrategy())
+                            .fileResource(BindingIntegrationTest.this.tempFile)
+                            .containingText()
+                            .to(String.class, "tempFile")
+                            .using(binder());
+                    Resources.bind().constant()
+                            .fileResource(BindingIntegrationTest.this.tempFile)
+                            .containingText()
+                            .to(String.class, "bufferedFile")
+                            .in(Singleton.class)
+                            .using(binder());
+                } catch (final IOException | URISyntaxException e) {
+                    throw new RuntimeException(e);
                 }
 
                 Resources.bind().constant()
@@ -121,6 +154,12 @@ public class BindingIntegrationTest {
         }).injectMembers(this);
     }
 
+    private void writeString(String s) throws IOException {
+        try (Writer w = new OutputStreamWriter(new FileOutputStream(this.tempFile))) {
+            w.write(s);
+        }
+    }
+
     @Test
     public void testCustomTextContentType() throws Exception {
         assertEquals(TEST_OBJECT, this.object);
@@ -151,5 +190,19 @@ public class BindingIntegrationTest {
     public void testConvertedObjectFromProperties() throws Exception {
         assertArrayEquals(new String[] { "a", "b", "c" },
                 this.propertiesContent.getSampleObject().getContent());
+    }
+
+    @Test
+    public void testReloadCachedResource() throws Exception {
+        assertEquals("test", this.tempString.get());
+        writeString("foobar");
+        assertEquals("foobar", this.tempString.get());
+    }
+
+    @Test
+    public void testConstantResource() throws Exception {
+        assertEquals("test", this.bufferedString.get());
+        writeString("foobar");
+        assertEquals("test", this.bufferedString.get());
     }
 }

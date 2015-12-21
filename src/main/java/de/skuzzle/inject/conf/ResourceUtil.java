@@ -39,7 +39,11 @@ class ResourceUtil {
     }
 
     public Reader newReader(Path path, Charset cs) throws IOException {
-        return Files.newBufferedReader(path, cs);
+        if (cs == null) {
+            return Files.newBufferedReader(path);
+        } else {
+            return Files.newBufferedReader(path, cs);
+        }
     }
 
     public InputStream newInputStream(URL url) throws IOException {
