@@ -30,13 +30,15 @@ public class CachedTextResourceTest {
 
     @Mock
     private TextResource wrapped;
+    @Mock
+    private ResourceUtil resourceUtil;
 
     private TextResource subject;
 
     @Before
     public void setUp() throws Exception {
-        this.subject = CachedTextResource.wrap(this.wrapped,
-                ConstantCacheStrategy.getInstance());
+        this.subject = new CachedTextResource(this.wrapped,
+                ConstantCacheStrategy.getInstance(), this.resourceUtil);
     }
 
     @Test
