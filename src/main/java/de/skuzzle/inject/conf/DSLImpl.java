@@ -77,8 +77,8 @@ final class DSLImpl implements
         }
 
         @SuppressWarnings("unchecked")
-        private T create(Provider<TextContentType> contentTypeProvider) {
-            final TextResource resource = createResource();
+        private T create(Provider<TextContentType> contentTypeProvider,
+                TextResource resource) {
             final Class<T> targetType = (Class<T>) this.targetKey
                     .getTypeLiteral().getRawType();
             final TextContentType contentTypeInst = contentTypeProvider.get();
@@ -97,6 +97,7 @@ final class DSLImpl implements
         public void using(Binder binder) {
             checkArgument(binder != null, "binder is null");
 
+            final TextResource resource = createResource();
             final Provider<TextContentType> contentTypeProvider;
             if (DSLImpl.this.contentType != null) {
                 binder.requestInjection(DSLImpl.this.contentType);
@@ -109,7 +110,7 @@ final class DSLImpl implements
                         DSLImpl.this.contentTypeType);
             }
 
-            final Provider<T> provider = () -> create(contentTypeProvider);
+            final Provider<T> provider = () -> create(contentTypeProvider, resource);
             if (DSLImpl.this.servletCtxProvider != null) {
                 final Provider<ServletContext> realProvider = binder.getProvider(
                         ServletContext.class);

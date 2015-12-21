@@ -113,7 +113,6 @@ public class BindingIntegrationTest {
                             .fileResource(BindingIntegrationTest.this.tempFile)
                             .containingText()
                             .to(String.class, "bufferedFile")
-                            .in(Singleton.class)
                             .using(binder());
                 } catch (final IOException | URISyntaxException e) {
                     throw new RuntimeException(e);
