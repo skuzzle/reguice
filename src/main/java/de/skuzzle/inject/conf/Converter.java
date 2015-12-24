@@ -4,10 +4,14 @@ import java.io.File;
 
 /**
  * When binding to interfaces, a converter can parse a String to a more complex
- * type like for example a {@link File}.
+ * type like for example a {@link File}. Implementations of this interface are
+ * automatically discovered when being registered as a service provider. When
+ * two ore more converters are registered for the same type, an arbitrary one
+ * will win (a warning will be logged).
  *
  * @author Simon Taddiken
  * @param <T> The target type.
+ * @since 0.3.0
  */
 public interface Converter<T> {
 
@@ -27,5 +31,5 @@ public interface Converter<T> {
      * @throws ConverterException When the given String can not be coerced to an
      *             instance of the type returned by {@link #forType()}.
      */
-    T parseString(String s) throws ConverterException;
+    T parseString(String s);
 }

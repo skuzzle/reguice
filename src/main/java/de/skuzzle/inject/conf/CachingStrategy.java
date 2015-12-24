@@ -5,7 +5,8 @@ import java.io.IOException;
 /**
  * Controls when a cached resource's data will be refreshed. Implementations
  * must either be state less or depend their state on the {@link TextResource}
- * instance that is passed into every method.
+ * instance that is passed into every method. If an implementation is not state less it
+ * must be thread safe for general purpose use.
  * <p>
  * A cached resource separately caches its binary and its text content.
  * </p>
