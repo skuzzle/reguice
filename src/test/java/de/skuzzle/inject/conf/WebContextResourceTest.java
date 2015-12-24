@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -17,6 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -62,7 +64,8 @@ public class WebContextResourceTest {
         final Reader reader = mock(Reader.class);
         final URL url = new URL("http://www.google.com");
         when(this.ctx.getResource(this.resourcePath)).thenReturn(url);
-        when(this.util.newReader(url, Charset.defaultCharset())).thenReturn(reader);
+        when(this.util.newReader(Mockito.any(InputStream.class),
+                Mockito.eq(Charset.defaultCharset()))).thenReturn(reader);
         final Reader result = this.subject.openStream();
         assertSame(reader, result);
     }

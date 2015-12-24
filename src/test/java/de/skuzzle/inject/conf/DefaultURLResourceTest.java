@@ -5,6 +5,7 @@ import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -13,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -35,7 +37,8 @@ public class DefaultURLResourceTest {
     @Test
     public void testOpenStream() throws Exception {
         final Reader reader = mock(Reader.class);
-        when(this.util.newReader(this.url, Charset.defaultCharset())).thenReturn(reader);
+        when(this.util.newReader(Mockito.any(InputStream.class),
+                Mockito.eq(Charset.defaultCharset()))).thenReturn(reader);
         final Reader actual = this.subject.openStream();
         assertSame(reader, actual);
     }

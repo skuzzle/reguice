@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -41,7 +42,8 @@ public class ClassPathResourceTest {
         final URL url = new URL("http://www.google.com");
         final Charset charset = Charset.defaultCharset();
         when(this.classLoader.getResource(this.resourcePath)).thenReturn(url);
-        when(this.util.newReader(url, charset)).thenReturn(reader);
+        when(this.util.newReader(Mockito.any(InputStream.class),
+                Mockito.eq(charset))).thenReturn(reader);
 
         final Reader actual = this.subject.openStream();
         assertSame(reader, actual);

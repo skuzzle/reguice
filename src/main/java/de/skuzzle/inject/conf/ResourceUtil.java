@@ -61,10 +61,6 @@ class ResourceUtil {
         return newReader(connection.getInputStream(), cs);
     }
 
-    public Reader newReader(URL url, Charset charset) throws IOException {
-        return newReader(url.openStream(), charset);
-    }
-
     public Reader newReader(InputStream stream, Charset charset) throws IOException {
         return new InputStreamReader(stream, charset);
     }

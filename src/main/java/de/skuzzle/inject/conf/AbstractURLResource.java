@@ -40,7 +40,7 @@ abstract class AbstractURLResource implements TextResource {
         if (this.charset == null) {
             return this.util.newReader(getURL());
         }
-        return this.util.newReader(getURL(), this.charset);
+        return this.util.newReader(openBinaryStream(), this.charset);
     }
 
     @Override
