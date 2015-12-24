@@ -24,7 +24,9 @@ reguice is available from Maven Central:
 ## Quickstart
 
 The fluent API is accessible through the `Resources` class and may be used in your Guice 
-`Module`. The following example will bind the content of the MANIFEST.MF to a String 
+`Module`. You can find some additional examples of how to bind resources 
+[here](https://github.com/skuzzle/reguice/blob/master/src/it/java/de/skuzzle/inject/conf/BindingIntegrationTest.java).
+The following example will bind the content of the MANIFEST.MF to a String 
 annotated with `@Named("manifestContent")`.
 
 ```java
