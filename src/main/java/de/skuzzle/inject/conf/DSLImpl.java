@@ -302,7 +302,7 @@ final class DSLImpl implements
     }
 
     @Override
-    public ChooseResources buffered() {
+    public ChooseResources changing() {
         this.cacheStrategy = new TimestampCacheStrategy();
         return this;
     }

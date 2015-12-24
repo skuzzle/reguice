@@ -85,7 +85,7 @@ public class DSLImplTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testBindInvalidURL() throws Exception {
-        this.subject.buffered()
+        this.subject.changing()
                 .urlResource("sdfsdfs<t");
     }
 

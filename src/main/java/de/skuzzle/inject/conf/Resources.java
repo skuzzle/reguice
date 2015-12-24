@@ -105,7 +105,7 @@ public interface Resources {
     }
 
     interface ChooseBufferType extends ChooseResources {
-        ChooseResources buffered();
+        ChooseResources changing();
 
         ChooseResources constant();
 

@@ -128,7 +128,7 @@ public class BindingIntegrationTest {
                         .in(Singleton.class)
                         .using(binder());
 
-                Resources.bind().buffered()
+                Resources.bind().changing()
                         .classPathResource("test.json")
                         .encodedWith(StandardCharsets.ISO_8859_1)
                         .containingJson()
@@ -142,13 +142,13 @@ public class BindingIntegrationTest {
                         .to(String.class)
                         .using(binder());
 
-                Resources.bind().buffered()
+                Resources.bind().changing()
                         .classPathResource("test.properties")
                         .containingProperties()
                         .to(Properties.class)
                         .using(binder());
 
-                Resources.bind().buffered()
+                Resources.bind().changing()
                         .classPathResource("test.properties")
                         .containingProperties()
                         .to(PropertiesInterface.class)
