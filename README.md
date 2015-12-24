@@ -98,7 +98,7 @@ public interface AppSettings {
 @Override
 public void configure() {
     Resources.bind()
-            .buffered()
+            .changing()
             .classPathResource("config/appSettings.properties")
             .encodedWith(StandardCharset.UTF_8)
             .containingProperties()
