@@ -30,7 +30,7 @@ import com.google.inject.Singleton;
  * of noticing a forgotten call to {@link Finalize#using(Binder)}.</b>
  * <ol>
  * <li>
- * <b>Choosing a buffer type</b><em> (optional)</em><br/>
+ * <b>Choosing a buffer type</b><em> (optional)</em><br>
  * You may chose between 3 different kinds of buffering the content of the
  * resource to be bound:
  * <ul>
@@ -47,13 +47,13 @@ import com.google.inject.Singleton;
  * buffer type will make sense. If your resource is bound as {@link Singleton}
  * there is no need to buffer it, as it is anyway read only once.</li>
  * <li>
- * <b>Choosing the source</b><br/>
+ * <b>Choosing the source</b><br>
  * During this mandatory step the source of the resource is specified. The
  * resource can be read from the class path, the file system, from an
  * {@link URL} or from a {@link ServletContext}. You can also directly provide
  * an instance of {@link TextResource} here.</li>
  * <li>
- * <b>Choosing the encoding</b> <em>(Optional)</em><br/>
+ * <b>Choosing the encoding</b> <em>(Optional)</em><br>
  * Reading characters from a binary source <em>always</em> requires an encoding.
  * There a several possibilities of specifying the encoding for the resource:
  * <ul>
@@ -71,22 +71,22 @@ import com.google.inject.Singleton;
  * application system dependent. Thus this should be avoided in favor of
  * explicit specification of the charset.</li>
  * <li>
- * <b>Choosing the content type</b><br/>
+ * <b>Choosing the content type</b><br>
  * The content type is responsible for creating an actual Java Object from the
  * content of the resource. There are a few types provided but you can also pass
  * a custom {@link TextContentType}.</li>
  * <li>
- * <b>Choosing the bound type</b><br\>
+ * <b>Choosing the bound type</b><br>
  * This step serves two purposes. It specifies the type (or {@link Key}) that
  * will be bound by Guice. Additionally this type will be passed to the
  * implementation of {@link TextContentType#createInstance(Class, TextResource)}
  * .</li>
  * <li>
- * <b>Choosing the scope</b> <em>(Optional)</em><br\>
+ * <b>Choosing the scope</b> <em>(Optional)</em><br>
  * By default all types are bound unscoped. You may chose to specify an explicit
  * scope here.</li>
  * <li>
- * <b>Finalizing</b><br\>
+ * <b>Finalizing</b><br>
  * Finishes the configuration by actually publishing a binding to the passed
  * {@link Binder}.</li>
  * </ol>
