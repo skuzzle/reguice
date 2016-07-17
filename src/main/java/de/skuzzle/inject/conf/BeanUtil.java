@@ -86,7 +86,7 @@ class BeanUtil {
                 throw new IllegalArgumentException(String.format(
                         "Could not create a Collection instance of type '%s'. "
                                 + "Error while invoking its default constructor",
-                        type.getName()));
+                        type.getName()), e);
             }
         }
     }
