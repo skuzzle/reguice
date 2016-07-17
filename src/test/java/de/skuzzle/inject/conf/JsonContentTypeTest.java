@@ -21,6 +21,10 @@ import com.google.inject.ProvisionException;
 @RunWith(MockitoJUnitRunner.class)
 public class JsonContentTypeTest {
 
+    private static enum TestEnum {
+        FOO, Bar
+    }
+
     private static class Sample {
         public int foo = 1;
     }
@@ -43,6 +47,8 @@ public class JsonContentTypeTest {
         long getWithParameter(Object object);
 
         List<String> getStringList();
+
+        TestEnum getEnum();
     }
 
     private static interface Sample3 {
@@ -62,7 +68,8 @@ public class JsonContentTypeTest {
             "  }," +
             "  stringList: [\n" +
             "    'foo', 'bar'\n" +
-            "  ]\n" +
+            "  ],\n" +
+            "  enum: 'Bar'\n" +
             "}";
 
     @Mock
@@ -115,5 +122,14 @@ public class JsonContentTypeTest {
 
         final List<String> expected = Arrays.asList("foo", "bar");
         assertEquals(expected, inst.getStringList());
+    }
+
+    @Test
+    public void testEnum() throws Exception {
+        final Reader reader = new StringReader(this.json2);
+        when(this.resource.openStream()).thenReturn(reader);
+        final Sample2 inst = this.subject.createInstance(Sample2.class, this.resource);
+
+        assertEquals(TestEnum.Bar, inst.getEnum());
     }
 }

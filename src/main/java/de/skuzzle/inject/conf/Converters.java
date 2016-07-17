@@ -45,8 +45,8 @@ final class Converters {
             final Converter<?> previous = CONVERTERS.put(type, converter);
             if (previous != null) {
                 LOG.warn("Duplicated converter mapping. Converter {} for type {} has " +
-                    "been overridden with converter {}", previous, type.getName(),
-                    converter);
+                        "been overridden with converter {}", previous, type.getName(),
+                        converter);
             }
         });
     }
@@ -55,8 +55,13 @@ final class Converters {
         // hidden constructor
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public static <T> T parseString(Class<T> targetType, String s) {
+        if (targetType.isEnum()) {
+            // must use raw type here
+            return (T) Enum.valueOf((Class) targetType, s);
+        }
+
         final Function<String, T> prim = (Function<String, T>) PARSERS.get(targetType);
         if (prim != null) {
             return prim.apply(s);
