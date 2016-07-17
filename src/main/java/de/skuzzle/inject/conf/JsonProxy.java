@@ -6,6 +6,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,16 +33,16 @@ class JsonProxy implements InvocationHandler {
         final String propertyName = this.beanUtil.getPropertyName(method.getName());
         final JsonElement element = this.root.get(propertyName);
 
-        return getObject(propertyName, element, method.getReturnType());
+        return getObject(propertyName, element, method.getReturnType(), method);
     }
 
     private Object getObject(String memberName, JsonElement element,
-            Class<?> targetType) {
+            Class<?> targetType, Method method) {
         return this.objectMap.computeIfAbsent(memberName,
-                key -> coerce(targetType, element));
+                key -> coerce(targetType, element, method));
     }
 
-    private Object coerce(Class<?> targetType, JsonElement element) {
+    private Object coerce(Class<?> targetType, JsonElement element, Method method) {
         if (element == null) {
             return null;
         } else if (element.isJsonPrimitive()) {
@@ -49,8 +50,8 @@ class JsonProxy implements InvocationHandler {
         } else if (element.isJsonNull()) {
             return null;
         } else if (element.isJsonArray()) {
-            return coerceArray(targetType, element.getAsJsonArray());
-        }  else if (element.isJsonObject()) {
+            return coerceArray(targetType, element.getAsJsonArray(), method);
+        } else if (element.isJsonObject()) {
             return coerceObject(targetType, element.getAsJsonObject());
         }
         throw new AssertionError("not reachable");
@@ -69,16 +70,34 @@ class JsonProxy implements InvocationHandler {
         throw new AssertionError();
     }
 
-    private Object coerceArray(Class<?> targetType, JsonArray array) {
+    private Object coerceArray(Class<?> targetType, JsonArray array, Method method) {
+        if (Collection.class.isAssignableFrom(targetType)) {
+            return coerceCollection(targetType, array, method);
+        }
+
         checkArgument(targetType.isArray());
         final Object arr = Array.newInstance(targetType.getComponentType(),
                 array.size());
         for (int i = 0; i < array.size(); ++i) {
             final Object elem = coerce(targetType.getComponentType(),
-                    array.get(i));
+                    array.get(i), method);
             Array.set(arr, i, elem);
         }
         return arr;
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private Object coerceCollection(Class<?> targetType, JsonArray array, Method method) {
+        checkArgument(Collection.class.isAssignableFrom(targetType));
+        final Collection result = this.beanUtil.createCollection(targetType);
+        final Class<?> elementType = this.beanUtil.getReturnTypeParameter(method);
+        for (int i = 0; i < array.size(); ++i) {
+            final Object elem = coerce(elementType,
+                    array.get(i), method);
+            checkArgument(elementType.isInstance(elem));
+            result.add(elem);
+        }
+        return result;
     }
 
     private Object coerceObject(Class<?> targetType, JsonObject object) {

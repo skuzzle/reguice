@@ -1,11 +1,19 @@
 {
     foo: 1337,
     pi: 3.1415, 
-    bar: 'xyzö', 
+    bar: 'xyzï¿½', 
     cool: true, 
     array: [1, 2, 3], 
     sample: { 
         object: 'abc' 
     },
-    sampleObject: 'a,b,c'
+    sampleObject: 'a,b,c',
+    listSample: [
+       {
+           object: 'test'
+       },
+       {
+           object: 'foo'
+       }
+    ]
 }

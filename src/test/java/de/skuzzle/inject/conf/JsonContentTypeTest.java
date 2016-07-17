@@ -7,6 +7,8 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,19 +27,27 @@ public class JsonContentTypeTest {
 
     private static interface Sample2 {
         int getFoo();
+
         double getPi();
+
         String getBar();
+
         boolean isCool();
+
         int[] getArray();
+
         Sample3 getSample();
+
         Object getUnknown();
+
         long getWithParameter(Object object);
+
+        List<String> getStringList();
     }
 
     private static interface Sample3 {
         Object getObject();
     }
-
 
     private final String json = "{ foo: 1 }";
 
@@ -49,7 +59,10 @@ public class JsonContentTypeTest {
             "  array: [1, 2, 3],\n" +
             "  sample: {\n" +
             "    object: 'abc'\n" +
-            "  }" +
+            "  }," +
+            "  stringList: [\n" +
+            "    'foo', 'bar'\n" +
+            "  ]\n" +
             "}";
 
     @Mock
@@ -85,12 +98,22 @@ public class JsonContentTypeTest {
         assertEquals(true, inst.isCool());
         assertEquals(null, inst.getUnknown());
         assertEquals("abc", inst.getSample().getObject());
-        assertArrayEquals(new int[] {1, 2, 3}, inst.getArray());
+        assertArrayEquals(new int[] { 1, 2, 3 }, inst.getArray());
     }
 
     @Test(expected = ProvisionException.class)
     public void testIOException() throws Exception {
         when(this.resource.openStream()).thenThrow(IOException.class);
         this.subject.createInstance(Sample.class, this.resource);
+    }
+
+    @Test
+    public void testStringList() throws Exception {
+        final Reader reader = new StringReader(this.json2);
+        when(this.resource.openStream()).thenReturn(reader);
+        final Sample2 inst = this.subject.createInstance(Sample2.class, this.resource);
+
+        final List<String> expected = Arrays.asList("foo", "bar");
+        assertEquals(expected, inst.getStringList());
     }
 }

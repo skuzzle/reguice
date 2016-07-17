@@ -1,11 +1,24 @@
 package de.skuzzle.inject.conf;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 class BeanUtil {
 
+    private static final Map<Class<?>, Supplier<?>> COLLECTION_CONSTRUCTORS;
     private static final Map<Class<?>, Function<Number, ?>> NUMBER_MAPPER;
     static {
         NUMBER_MAPPER = new HashMap<>();
@@ -21,6 +34,11 @@ class BeanUtil {
         NUMBER_MAPPER.put(Float.TYPE, Number::floatValue);
         NUMBER_MAPPER.put(Double.class, Number::doubleValue);
         NUMBER_MAPPER.put(Double.TYPE, Number::doubleValue);
+
+        COLLECTION_CONSTRUCTORS = new HashMap<>();
+        COLLECTION_CONSTRUCTORS.put(Set.class, HashSet::new);
+        COLLECTION_CONSTRUCTORS.put(List.class, ArrayList::new);
+        COLLECTION_CONSTRUCTORS.put(Queue.class, ArrayDeque::new);
     }
 
     public Object coerceType(String value, Class<?> targetType) {
@@ -50,5 +68,32 @@ class BeanUtil {
         b.append(part);
         b.setCharAt(0, Character.toLowerCase(part.charAt(0)));
         return b.toString();
+    }
+
+    public Collection<?> createCollection(Class<?> type) {
+        if (type.isInterface()) {
+            final Supplier constructor = COLLECTION_CONSTRUCTORS.get(type);
+            checkArgument(constructor != null,
+                    "Could not create a Collection instance of interface type '%s'. "
+                            + "The framework does not know a default implementation for it.",
+                    type.getName());
+            return (Collection<?>) constructor.get();
+        } else {
+            // collection implementations should normally all have a default ctor
+            try {
+                return (Collection<?>) type.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new IllegalArgumentException(String.format(
+                        "Could not create a Collection instance of type '%s'. "
+                                + "Error while invoking its default constructor",
+                        type.getName()));
+            }
+        }
+    }
+
+    public Class<?> getReturnTypeParameter(Method method) {
+        final ParameterizedType paramType = (ParameterizedType) method
+                .getGenericReturnType();
+        return (Class<?>) paramType.getActualTypeArguments()[0];
     }
 }
