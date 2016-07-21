@@ -92,9 +92,9 @@ class JsonProxy implements InvocationHandler {
         final Collection result = this.beanUtil.createCollection(targetType);
         final Class<?> elementType = this.beanUtil.getReturnTypeParameter(method);
         for (int i = 0; i < array.size(); ++i) {
-            final Object elem = coerce(elementType,
-                    array.get(i), method);
-            checkArgument(elementType.isInstance(elem));
+            final Object elem = coerce(elementType, array.get(i), method);
+            checkArgument(elementType.isInstance(elem),
+                    "'%s' is not an instanceof element type %s", elem, elementType);
             result.add(elem);
         }
         return result;
