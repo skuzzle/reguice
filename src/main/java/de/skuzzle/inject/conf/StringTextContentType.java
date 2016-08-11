@@ -8,7 +8,12 @@ import java.io.Reader;
 import com.google.common.io.CharStreams;
 import com.google.inject.ProvisionException;
 
-final class StringTextContentType implements TextContentType {
+final class StringTextContentType implements TypedContentType<String> {
+
+    @Override
+    public Class<String> getType() {
+        return String.class;
+    }
 
     @Override
     public <T> T createInstance(Class<T> type, TextResource resource) {

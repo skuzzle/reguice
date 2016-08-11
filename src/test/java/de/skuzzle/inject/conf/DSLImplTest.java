@@ -39,7 +39,6 @@ public class DSLImplTest {
     @Mock
     private ScopedBindingBuilder scopedBuilder;
 
-
     private ContentTypeFactoryImpl contentTypeFactory;
 
     private final Key<DSLImplTest> selfType = Key.get(DSLImplTest.class);
@@ -51,7 +50,8 @@ public class DSLImplTest {
         this.subject = new DSLImpl(this.factory, this.contentTypeFactory);
 
         when(this.binder.bind(this.selfType)).thenReturn(this.linkedBuilder);
-        when(this.linkedBuilder.toProvider(Mockito.any(Provider.class))).thenReturn(this.scopedBuilder);
+        when(this.linkedBuilder.toProvider(Mockito.any(Provider.class)))
+                .thenReturn(this.scopedBuilder);
         when(this.binder.getProvider(Injector.class)).thenReturn(() -> this.injector);
     }
 
@@ -156,26 +156,6 @@ public class DSLImplTest {
     @Test(expected = IllegalArgumentException.class)
     public void testNullTest12() throws Exception {
         this.subject.to((Key) null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testNullTest13() throws Exception {
-        this.subject.to(getClass()).using(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testNullTest14() throws Exception {
-        this.subject.to(getClass()).in(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testNullTest15() throws Exception {
-        this.subject.to(getClass(), null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testNullTest16() throws Exception {
-        this.subject.to(null, "");
     }
 
     @Test(expected = IllegalArgumentException.class)

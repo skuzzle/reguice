@@ -81,14 +81,17 @@ public class BindingIntegrationTest {
             protected void configure() {
                 final ServletContext mockCtx = mock(ServletContext.class);
                 try {
-                    when(mockCtx.getResource(Mockito.anyString())).thenAnswer(new Answer<URL>() {
+                    when(mockCtx.getResource(Mockito.anyString()))
+                            .thenAnswer(new Answer<URL>() {
 
-                        @Override
-                        public URL answer(InvocationOnMock invocation) throws Throwable {
-                            final String s = invocation.getArgumentAt(0, String.class);
-                            return getClass().getClassLoader().getResource(s);
-                        }
-                    });
+                                @Override
+                                public URL answer(InvocationOnMock invocation)
+                                        throws Throwable {
+                                    final String s = invocation.getArgumentAt(0,
+                                            String.class);
+                                    return getClass().getClassLoader().getResource(s);
+                                }
+                            });
                 } catch (final MalformedURLException e) {
                     e.printStackTrace();
                 }
@@ -109,13 +112,13 @@ public class BindingIntegrationTest {
                             .fileResource(BindingIntegrationTest.this.tempFile)
                             .encodedWithSystemDefaultCharset()
                             .containingText()
-                            .to(String.class, "tempFile")
+                            .named("tempFile")
                             .using(binder());
                     Resources.bind().constant()
                             .fileResource(BindingIntegrationTest.this.tempFile)
                             .encodedWithProvidedCharset()
                             .containingText()
-                            .to(String.class, "bufferedFile")
+                            .named("bufferedFile")
                             .using(binder());
                 } catch (final IOException | URISyntaxException e) {
                     throw new RuntimeException(e);
@@ -124,7 +127,7 @@ public class BindingIntegrationTest {
                 Resources.bind().constant()
                         .servletResource("test.properties")
                         .containingText()
-                        .to(String.class, "fromServlet")
+                        .named("fromServlet")
                         .in(Singleton.class)
                         .using(binder());
 
@@ -139,7 +142,6 @@ public class BindingIntegrationTest {
                         .classPathResource("test.txt")
                         .encodedWith("UTF-8")
                         .containingText()
-                        .to(String.class)
                         .using(binder());
 
                 Resources.bind().changing()

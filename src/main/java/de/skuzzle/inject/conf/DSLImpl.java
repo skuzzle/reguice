@@ -27,6 +27,7 @@ import de.skuzzle.inject.conf.Resources.ChooseResources;
 import de.skuzzle.inject.conf.Resources.ChooseTargetType;
 import de.skuzzle.inject.conf.Resources.Finalize;
 import de.skuzzle.inject.conf.Resources.FinalizeWithScope;
+import de.skuzzle.inject.conf.Resources.TypeAlreadyChosen;
 
 final class DSLImpl implements
         ChooseBufferType,
@@ -35,7 +36,7 @@ final class DSLImpl implements
         ChooseContentTypeAndCharset,
         ChooseTargetType {
 
-    // either of these 2 fields will be nonnull
+    // either of these 2 fields will be nonnull (XOR)
     private TextContentType contentType;
     private Class<? extends TextContentType> contentTypeType;
 
@@ -54,7 +55,7 @@ final class DSLImpl implements
     }
 
     private static class MutableProvider<T> implements Provider<T> {
-        private Provider<T> realProvider;
+        private volatile Provider<T> realProvider;
 
         void set(Provider<T> t) {
             this.realProvider = t;
@@ -64,6 +65,44 @@ final class DSLImpl implements
         public T get() {
             checkState(this.realProvider != null, "ServletContext not available");
             return this.realProvider.get();
+        }
+    }
+
+    private class TypeAlreadyChosenImpl<T> implements TypeAlreadyChosen<T> {
+        private final Class<T> type;
+
+        TypeAlreadyChosenImpl(Class<T> type) {
+            this.type = type;
+        }
+
+        @Override
+        public Finalize<T> in(Class<? extends Annotation> scope) {
+            final Key<T> key = Key.get(this.type);
+            return new FinalizeImpl<>(key).in(scope);
+        }
+
+        @Override
+        public void using(Binder binder) {
+            final Key<T> key = Key.get(this.type);
+            new FinalizeImpl<>(key).using(binder);
+        }
+
+        @Override
+        public FinalizeWithScope<T> annotatedWith(Annotation annotation) {
+            final Key<T> key = Key.get(this.type, annotation);
+            return new FinalizeImpl<>(key);
+        }
+
+        @Override
+        public FinalizeWithScope<T> annotatedWith(
+                Class<? extends Annotation> annotationType) {
+            final Key<T> key = Key.get(this.type, annotationType);
+            return new FinalizeImpl<>(key);
+        }
+
+        @Override
+        public FinalizeWithScope<T> named(String name) {
+            return annotatedWith(Names.named(name));
         }
     }
 
@@ -105,7 +144,7 @@ final class DSLImpl implements
             } else {
                 checkState(DSLImpl.this.contentTypeType != null,
                         "either explicit content type instance or " +
-                        "content type class must be specified");
+                                "content type class must be specified");
                 contentTypeProvider = (Provider<TextContentType>) binder.getProvider(
                         DSLImpl.this.contentTypeType);
             }
@@ -144,16 +183,9 @@ final class DSLImpl implements
     }
 
     @Override
-    public <T> FinalizeWithScope<T> to(Class<T> type) {
+    public <T> TypeAlreadyChosenImpl<T> to(Class<T> type) {
         checkArgument(type != null, "type is null");
-        return new FinalizeImpl<>(Key.get(type));
-    }
-
-    @Override
-    public <T> FinalizeWithScope<T> to(Class<T> type, String name) {
-        checkArgument(type != null, "type is null");
-        checkArgument(name != null, "name is null");
-        return new FinalizeImpl<>(Key.get(type, Names.named(name)));
+        return new TypeAlreadyChosenImpl<>(type);
     }
 
     @Override
@@ -170,14 +202,9 @@ final class DSLImpl implements
     }
 
     @Override
-    public ChooseTargetType containingXml() {
-        throw new UnsupportedOperationException("not implemented yet");
-    }
-
-    @Override
-    public ChooseTargetType containingText() {
+    public TypeAlreadyChosen<String> containingText() {
         this.contentType = this.contentTypeFactory.newStringContentType();
-        return this;
+        return new TypeAlreadyChosenImpl<>(String.class);
     }
 
     @Override
@@ -198,6 +225,13 @@ final class DSLImpl implements
         checkArgument(contentTypeType != null, "contentTypeType is null");
         this.contentTypeType = contentTypeType;
         return this;
+    }
+
+    @Override
+    public <T> TypeAlreadyChosen<T> containing(TypedContentType<T> contentType) {
+        checkArgument(this.contentTypeType != null, "contentTypeType is null");
+        this.contentType = contentType;
+        return new TypeAlreadyChosenImpl<>(contentType.getType());
     }
 
     @Override
@@ -247,7 +281,7 @@ final class DSLImpl implements
     @Override
     public ChooseContentTypeAndCharset servletResource(String path) {
         checkArgument(path != null, "path is null");
-        this.servletCtxProvider = new MutableProvider<ServletContext>();
+        this.servletCtxProvider = new MutableProvider<>();
         this.resourceFactory = cs -> this.textResourceFactory.newServletResource(path,
                 this.servletCtxProvider, cs);
         return this;
